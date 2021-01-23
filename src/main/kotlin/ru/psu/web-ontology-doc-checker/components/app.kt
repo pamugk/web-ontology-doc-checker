@@ -1,21 +1,19 @@
 package ru.psu.web_ontology_doc_checker.components
 
-import com.ccfraser.muirwik.components.MAppBarPosition
+import com.ccfraser.muirwik.components.*
 import com.ccfraser.muirwik.components.button.mIconButton
 import com.ccfraser.muirwik.components.card.mCard
-import com.ccfraser.muirwik.components.mAppBar
-import com.ccfraser.muirwik.components.mToolbar
-import com.ccfraser.muirwik.components.mTypography
-import kotlinx.css.LinearDimension
-import kotlinx.css.flex
-import kotlinx.css.marginLeft
+import com.ccfraser.muirwik.components.input.mInput
+import kotlinx.css.*
+import kotlinx.html.InputType
 import react.*
 import styled.css
 
 class AppState(
     var K: Int,
     var N: Int,
-    var showDialog: Boolean
+    var showDialog: Boolean,
+    var selectedTab: Any
 ): RState
 
 class App(props: RProps) : RComponent<RProps, AppState>(props) {
@@ -24,7 +22,8 @@ class App(props: RProps) : RComponent<RProps, AppState>(props) {
         state = AppState(
             K = 1,
             N = 10,
-            showDialog = false
+            showDialog = false,
+            selectedTab = 0
         )
     }
 
@@ -41,7 +40,23 @@ class App(props: RProps) : RComponent<RProps, AppState>(props) {
         }
         mCard {
             css {
+                display = Display.flex
                 flex(1.0, 1.0)
+            }
+            mTabs(state.selectedTab, variant = MTabVariant.scrollable, orientation = MTabOrientation.vertical,
+                onChange = {_, newTab -> setState { selectedTab = newTab }}) {
+                mTab("Документы", value = 0)
+                mTab("Обработка", value = 1)
+                mTab("Итог", value = 2)
+            }
+            mContainer {
+                css {
+                    display = Display.flex
+                    flexDirection = FlexDirection.column
+                }
+                mInput(type = InputType.file) {
+                    mIcon("add_circle_outline")
+                }
             }
         }
         settingsDialog(state.K, state.N, state.showDialog,
