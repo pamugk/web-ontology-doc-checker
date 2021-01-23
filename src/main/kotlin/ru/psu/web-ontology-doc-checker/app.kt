@@ -60,7 +60,7 @@ class App(props: RProps) : RComponent<RProps, AppState>(props) {
                 mTextField("N",
                     onChange = {
                         val value = it.targetInputValue.toIntOrNull() ?: state.N
-                        if (value > 0 && value < 99) setState { N = value }
+                        if (value in 1..99) setState { N = value }
                     },
                     type = InputType.number,
                     value = state.N.toString(),
@@ -68,7 +68,7 @@ class App(props: RProps) : RComponent<RProps, AppState>(props) {
                 mTextField("K",
                     onChange = {
                         val value = it.targetInputValue.toIntOrNull() ?: state.K
-                        if (value > 0 && value < 99) setState { K = value }
+                        if (value in 1..99) setState { K = value }
                     },
                     type = InputType.number,
                     value = state.K.toString(),
