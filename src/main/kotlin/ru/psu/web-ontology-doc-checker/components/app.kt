@@ -4,6 +4,7 @@ import com.ccfraser.muirwik.components.*
 import com.ccfraser.muirwik.components.button.mIconButton
 import com.ccfraser.muirwik.components.card.mCard
 import com.ccfraser.muirwik.components.input.mInput
+import kotlinx.browser.document
 import kotlinx.css.*
 import kotlinx.html.InputType
 import react.*
@@ -49,13 +50,19 @@ class App(props: RProps) : RComponent<RProps, AppState>(props) {
                 mTab("Обработка", value = 1)
                 mTab("Итог", value = 2)
             }
-            mContainer {
-                css {
-                    display = Display.flex
-                    flexDirection = FlexDirection.column
+            when (state.selectedTab) {
+                0 -> mContainer {
+                    css {
+                        display = Display.flex
+                        flexDirection = FlexDirection.column
+                    }
+                    mIconButton("add_circle_outline", onClick = { openFileDialog({ event ->  }) })
                 }
-                mInput(type = InputType.file) {
-                    mIcon("add_circle_outline")
+                1 -> {
+
+                }
+                2 -> {
+
                 }
             }
         }
