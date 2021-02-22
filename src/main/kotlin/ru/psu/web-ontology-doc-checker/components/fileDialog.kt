@@ -7,6 +7,7 @@ import org.w3c.dom.events.MouseEvent
 fun openFileDialog(callback: (Event) -> Unit) {
     val input = document.createElement("input")
     input.setAttribute("type", "file")
+    input.setAttribute("multiple", "multiple")
     input.addEventListener("change", callback)
     input.dispatchEvent(MouseEvent("click"))
 }

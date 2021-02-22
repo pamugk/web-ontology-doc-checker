@@ -5,8 +5,11 @@ import com.ccfraser.muirwik.components.button.mIconButton
 import com.ccfraser.muirwik.components.card.mCard
 import com.ccfraser.muirwik.components.input.mInput
 import kotlinx.browser.document
+import kotlinx.browser.window
 import kotlinx.css.*
+import kotlinx.html.INPUT
 import kotlinx.html.InputType
+import org.w3c.files.FileReader
 import react.*
 import styled.css
 
@@ -56,7 +59,12 @@ class App(props: RProps) : RComponent<RProps, AppState>(props) {
                         display = Display.flex
                         flexDirection = FlexDirection.column
                     }
-                    mIconButton("add_circle_outline", onClick = { openFileDialog({ event ->  }) })
+                    mIconButton("add_circle_outline", onClick = { openFileDialog(
+                        { event ->
+                            val fReader = FileReader()
+                            fReader.onloadend = { _ -> }
+                            fReader.readAsText()
+                        }) })
                 }
                 1 -> {
 
