@@ -1,3 +1,1 @@
-
-rootProject.name = "web-ontology-doc-checker"
-
+rootProject.name = "web_ontology_doc_checker"

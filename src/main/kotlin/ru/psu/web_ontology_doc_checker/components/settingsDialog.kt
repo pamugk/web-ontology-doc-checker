@@ -11,7 +11,7 @@ import kotlinx.html.InputType
 import react.*
 
 fun RBuilder.settingsDialog(
-    K: Int, N: Int, showDialog: Boolean, onClose: (()->Unit), onNChange: ((Int)->Unit), onKChange: ((Int)->Unit)) =
+    K: Int, N: Int, showDialog: Boolean, onClose: ()->Unit, onNChange: (Int)->Unit, onKChange: (Int)->Unit) =
     mDialog(showDialog, onClose =  { _, _ -> onClose.invoke() }) {
         mDialogTitle("Настройки")
         mDialogContent {

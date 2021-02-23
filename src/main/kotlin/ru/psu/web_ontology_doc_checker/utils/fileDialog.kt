@@ -1,4 +1,4 @@
-package ru.psu.web_ontology_doc_checker.components
+package ru.psu.web_ontology_doc_checker.utils
 
 import kotlinx.browser.document
 import org.w3c.dom.events.Event

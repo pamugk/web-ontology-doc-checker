@@ -3,21 +3,19 @@ package ru.psu.web_ontology_doc_checker.components
 import com.ccfraser.muirwik.components.*
 import com.ccfraser.muirwik.components.button.mIconButton
 import com.ccfraser.muirwik.components.card.mCard
-import com.ccfraser.muirwik.components.input.mInput
-import kotlinx.browser.document
-import kotlinx.browser.window
+import com.ccfraser.muirwik.components.card.mCardContent
 import kotlinx.css.*
-import kotlinx.html.INPUT
-import kotlinx.html.InputType
-import org.w3c.files.FileReader
 import react.*
+import ru.psu.web_ontology_doc_checker.components.documents.documentList
+import ru.psu.web_ontology_doc_checker.model.Document
 import styled.css
 
 class AppState(
     var K: Int,
     var N: Int,
     var showDialog: Boolean,
-    var selectedTab: Any
+    var selectedTab: Any,
+    var documents: List<Document>
 ): RState
 
 class App(props: RProps) : RComponent<RProps, AppState>(props) {
@@ -27,7 +25,8 @@ class App(props: RProps) : RComponent<RProps, AppState>(props) {
             K = 1,
             N = 10,
             showDialog = false,
-            selectedTab = 0
+            selectedTab = 0,
+            documents = emptyList()
         )
     }
 
@@ -47,30 +46,21 @@ class App(props: RProps) : RComponent<RProps, AppState>(props) {
                 display = Display.flex
                 flex(1.0, 1.0)
             }
-            mTabs(state.selectedTab, variant = MTabVariant.scrollable, orientation = MTabOrientation.vertical,
-                onChange = {_, newTab -> setState { selectedTab = newTab }}) {
-                mTab("Документы", value = 0)
-                mTab("Обработка", value = 1)
-                mTab("Итог", value = 2)
-            }
-            when (state.selectedTab) {
-                0 -> mContainer {
-                    css {
-                        display = Display.flex
-                        flexDirection = FlexDirection.column
+            mCardContent {
+                mTabs(state.selectedTab, variant = MTabVariant.scrollable, orientation = MTabOrientation.vertical,
+                    onChange = {_, newTab -> setState { selectedTab = newTab }}) {
+                    mTab("Документы", value = 0)
+                    mTab("Обработка", value = 1)
+                    mTab("Итог", value = 2)
+                }
+                when (state.selectedTab) {
+                    0 -> documentList(state.documents, ::onAddDocument, ::onRemoveDocument)
+                    1 -> {
+
                     }
-                    mIconButton("add_circle_outline", onClick = { openFileDialog(
-                        { event ->
-                            val fReader = FileReader()
-                            fReader.onloadend = { _ -> }
-                            fReader.readAsText()
-                        }) })
-                }
-                1 -> {
+                    2 -> {
 
-                }
-                2 -> {
-
+                    }
                 }
             }
         }
@@ -78,5 +68,13 @@ class App(props: RProps) : RComponent<RProps, AppState>(props) {
             onClose = { setState { showDialog = false}},
             onNChange = { value -> setState { N = value }},
             onKChange = { value -> setState { K = value }})
+    }
+
+    private fun onAddDocument(newDocument: Document) {
+        setState { documents = documents.plus(newDocument) }
+    }
+
+    private fun onRemoveDocument(removedDocument: Document) {
+        setState { documents = documents.minus(removedDocument) }
     }
 }
