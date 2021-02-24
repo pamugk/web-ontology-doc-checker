@@ -4,6 +4,7 @@ import com.ccfraser.muirwik.components.*
 import com.ccfraser.muirwik.components.button.mIconButton
 import com.ccfraser.muirwik.components.card.mCard
 import com.ccfraser.muirwik.components.card.mCardContent
+import kotlinx.browser.window
 import kotlinx.css.*
 import react.*
 import ru.psu.web_ontology_doc_checker.components.documents.documentList
@@ -47,6 +48,10 @@ class App(props: RProps) : RComponent<RProps, AppState>(props) {
                 flex(1.0, 1.0)
             }
             mCardContent {
+                css {
+                    display = Display.flex
+                    flex(1.0, 1.0)
+                }
                 mTabs(state.selectedTab, variant = MTabVariant.scrollable, orientation = MTabOrientation.vertical,
                     onChange = {_, newTab -> setState { selectedTab = newTab }}) {
                     mTab("Документы", value = 0)

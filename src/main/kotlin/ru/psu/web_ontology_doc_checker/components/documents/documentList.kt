@@ -10,6 +10,7 @@ import com.ccfraser.muirwik.components.dialog.mDialogTitle
 import com.ccfraser.muirwik.components.list.mList
 import com.ccfraser.muirwik.components.mContainer
 import com.ccfraser.muirwik.components.mTypography
+import kotlinx.browser.window
 import kotlinx.css.Display
 import kotlinx.css.FlexDirection
 import kotlinx.css.display
@@ -38,7 +39,7 @@ private val documentLis = functionalComponent<DocumentListProps> { props ->
             flexDirection = FlexDirection.column
         }
         mIconButton("add_circle_outline", onClick = {
-            openFileDialog { event -> handleFileInput(event, props.onDocumentRemoved, { showFileError = true }) }
+            openFileDialog { event -> handleFileInput(event, props.onDocumentAdded, { showFileError = true }) }
         })
         if (props.documents.isEmpty())
             mCard {
@@ -49,7 +50,7 @@ private val documentLis = functionalComponent<DocumentListProps> { props ->
         else {
             mList {
                 for (document in props.documents)
-                    documentItem(document, props.onDocumentRemoved, { newlySelectedDocument -> selectedDocument = newlySelectedDocument })
+                    documentItem(document, { newlySelectedDocument -> selectedDocument = newlySelectedDocument }, props.onDocumentRemoved)
             }
             documentDialog(selectedDocument, true) { selectedDocument = null }
         }
@@ -75,7 +76,7 @@ private fun handleFileInput(event: Event, onDocumentAdded: (Document)->Unit, onE
         run {
             val fReader = FileReader()
             fReader.onloadend = { _ -> onDocumentAdded(Document(file.name, file.name, fReader.result as String)) }
-            fReader.onerror = { _ -> }
+            fReader.onerror = { _ -> onError() }
             fReader.readAsText(file)
         }
     }
