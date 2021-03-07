@@ -4,11 +4,12 @@ import com.ccfraser.muirwik.components.*
 import com.ccfraser.muirwik.components.button.mIconButton
 import com.ccfraser.muirwik.components.card.mCard
 import com.ccfraser.muirwik.components.card.mCardContent
-import kotlinx.browser.window
 import kotlinx.css.*
 import react.*
 import ru.psu.web_ontology_doc_checker.components.documents.documentList
 import ru.psu.web_ontology_doc_checker.model.Document
+import ru.psu.web_ontology_doc_checker.model.jont.Onto
+import ru.psu.web_ontology_doc_checker.utils.importOntology
 import styled.css
 
 class AppState(
@@ -16,10 +17,15 @@ class AppState(
     var N: Int,
     var showDialog: Boolean,
     var selectedTab: Any,
-    var documents: List<Document>
+    var documents: List<Document>,
+    var ontology: Onto
 ): RState
 
-class App(props: RProps) : RComponent<RProps, AppState>(props) {
+external interface AppProps: RProps {
+    var ontology: String
+}
+
+class App(props: AppProps) : RComponent<AppProps, AppState>(props) {
 
     init {
         state = AppState(
@@ -27,7 +33,8 @@ class App(props: RProps) : RComponent<RProps, AppState>(props) {
             N = 10,
             showDialog = false,
             selectedTab = 0,
-            documents = emptyList()
+            documents = emptyList(),
+            ontology = importOntology(props.ontology)
         )
     }
 

@@ -11,13 +11,13 @@ class Onto(val last_id: Int,
 
     /**
      * @param id - unique identifier of node.
-     * @return node with given unique identifier. If no one node matches the given identifier, null is returned.
+     * @return node with given unique identifier. If no node matches the given identifier, null is returned.
      */
     fun getNodeByID(id: Int): Node? = nodes.singleOrNull { node -> node.id == id }
 
     /**
      * @param id - unique identifier of relation.
-     * @return relation with given unique identifier. If no one relation matches the given identifier, null is returned.
+     * @return relation with given unique identifier. If no relation matches the given identifier, null is returned.
      */
     fun getLinkByID(id: Int): Link? = relations.singleOrNull { link -> link.id == id }
 
@@ -25,13 +25,13 @@ class Onto(val last_id: Int,
      * @param name - name of node.
      * @return array of nodes matching the given name.
      * There can be more than one, since the name is not necessary unique within the ontology.
-     * If no one node matches the given name, array will be empty.
+     * If no node matches the given name, array will be empty.
      */
     fun getNodesByName(name: String): List<Node> = nodes.filter { node -> node.name == name }
 
     /**
      * @param name - name of node.
-     * @return first node matching the given name. If no one node matches the given name, null is returned.
+     * @return first node matching the given name. If no node matches the given name, null is returned.
      */
     fun getFirstNodeByName(name: String): Node? = nodes.singleOrNull { node -> node.name == name }
 

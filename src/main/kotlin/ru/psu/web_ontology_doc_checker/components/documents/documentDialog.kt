@@ -3,8 +3,12 @@ package ru.psu.web_ontology_doc_checker.components.documents
 import com.ccfraser.muirwik.components.*
 import com.ccfraser.muirwik.components.button.mIconButton
 import com.ccfraser.muirwik.components.dialog.*
+import kotlinx.css.Display
+import kotlinx.css.display
+import kotlinx.css.flex
 import react.RBuilder
 import ru.psu.web_ontology_doc_checker.model.Document
+import styled.css
 
 fun RBuilder.documentDialog(document: Document?, fullscreen: Boolean, onClose: () -> Unit) {
     if (document != null) {
@@ -16,7 +20,14 @@ fun RBuilder.documentDialog(document: Document?, fullscreen: Boolean, onClose: (
                 }
             }
             mDialogContent {
-                mTextFieldMultiLine("Содержимое", document.text, disabled = true)
+                css {
+                    display = Display.flex
+                }
+                mTextFieldMultiLine("Содержимое", document.text, disabled = true) {
+                    css {
+                        flex(1.0, 1.0)
+                    }
+                }
             }
         }
     }
