@@ -7,7 +7,7 @@ import kotlinx.css.Display
 import kotlinx.css.display
 import kotlinx.css.flex
 import react.RBuilder
-import ru.psu.web_ontology_doc_checker.model.Document
+import ru.psu.web_ontology_doc_checker.model.documents.Document
 import styled.css
 
 fun RBuilder.documentDialog(document: Document?, fullscreen: Boolean, onClose: () -> Unit) {

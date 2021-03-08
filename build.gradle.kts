@@ -1,6 +1,6 @@
 plugins {
-    kotlin("js") version "1.4.20"
-    kotlin("plugin.serialization") version "1.4.20"
+    kotlin("js") version "1.4.30"
+    kotlin("plugin.serialization") version "1.4.30"
 }
 
 group = "ru.psu"
@@ -13,14 +13,16 @@ repositories {
 }
 
 dependencies {
-    val kotlinVersion = "1.4.20"
-    val kotlinJsVersion = "pre.129-kotlin-$kotlinVersion"
+    val kotlinVersion = "1.4.30"
+    val kotlinJsVersion = "pre.148-kotlin-$kotlinVersion"
 
     implementation(kotlin("stdlib-js", kotlinVersion))
-    implementation("org.jetbrains", "kotlin-styled", "5.2.0-$kotlinJsVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
+    implementation("org.jetbrains:kotlin-styled:5.2.1-$kotlinJsVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
 
     implementation("com.ccfraser.muirwik:muirwik-components:0.6.3")
+
+    implementation(npm("natural", "4.0.0"))
 }
 
 kotlin {

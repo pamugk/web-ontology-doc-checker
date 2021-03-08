@@ -7,7 +7,10 @@ import com.ccfraser.muirwik.components.card.mCardContent
 import kotlinx.css.*
 import react.*
 import ru.psu.web_ontology_doc_checker.components.documents.documentList
-import ru.psu.web_ontology_doc_checker.model.Document
+import ru.psu.web_ontology_doc_checker.components.filteredDocuments.filteringPage
+import ru.psu.web_ontology_doc_checker.components.processors.rankingPage
+import ru.psu.web_ontology_doc_checker.model.documents.Document
+import ru.psu.web_ontology_doc_checker.model.documents.FilteredDocument
 import ru.psu.web_ontology_doc_checker.model.jont.Onto
 import ru.psu.web_ontology_doc_checker.utils.importOntology
 import styled.css
@@ -17,7 +20,13 @@ class AppState(
     var N: Int,
     var showDialog: Boolean,
     var selectedTab: Any,
-    var documents: List<Document>,
+
+    var documents: Set<Document>,
+    var documentsChanged: Boolean,
+
+    var filteredDocuments: List<FilteredDocument>,
+    var filteredDocsChanged: Boolean,
+
     var ontology: Onto
 ): RState
 
@@ -32,8 +41,14 @@ class App(props: AppProps) : RComponent<AppProps, AppState>(props) {
             K = 1,
             N = 10,
             showDialog = false,
-            selectedTab = 0,
-            documents = emptyList(),
+            selectedTab = Tabs.DOCUMENTS,
+
+            documents = emptySet(),
+            documentsChanged = false,
+
+            filteredDocuments = emptyList(),
+            filteredDocsChanged = false,
+
             ontology = importOntology(props.ontology)
         )
     }
@@ -41,7 +56,7 @@ class App(props: AppProps) : RComponent<AppProps, AppState>(props) {
     override fun RBuilder.render() {
         mAppBar(position = MAppBarPosition.sticky) {
             mToolbar {
-                mTypography("Онтологический упорядочиватель документов")
+                mTypography("Онтологический упорядочиватель документов") {}
                 mIconButton("settings", onClick = { setState { showDialog = true } }) {
                     css {
                         marginLeft = LinearDimension.auto
@@ -61,18 +76,17 @@ class App(props: AppProps) : RComponent<AppProps, AppState>(props) {
                 }
                 mTabs(state.selectedTab, variant = MTabVariant.scrollable, orientation = MTabOrientation.vertical,
                     onChange = {_, newTab -> setState { selectedTab = newTab }}) {
-                    mTab("Документы", value = 0)
-                    mTab("Обработка", value = 1)
-                    mTab("Итог", value = 2)
+                    mTab("Документы", value = Tabs.DOCUMENTS)
+                    mTab("Предобработка", value = Tabs.FILTERING)
+                    mTab("Ранжирование", value = Tabs.RANKING)
                 }
                 when (state.selectedTab) {
-                    0 -> documentList(state.documents, ::onAddDocument, ::onRemoveDocument)
-                    1 -> {
-
-                    }
-                    2 -> {
-
-                    }
+                    Tabs.DOCUMENTS -> documentList(state.documents, ::onAddDocument, ::onRemoveDocument)
+                    Tabs.FILTERING -> filteringPage(
+                        state.ontology,
+                        state.documents, state.documentsChanged, state.filteredDocuments,
+                        ::onFilterDocuments, ::clearFilteredDocuments)
+                    Tabs.RANKING -> rankingPage(state.filteredDocuments, state.filteredDocsChanged, emptyList(), {})
                 }
             }
         }
@@ -83,10 +97,18 @@ class App(props: AppProps) : RComponent<AppProps, AppState>(props) {
     }
 
     private fun onAddDocument(newDocument: Document) {
-        setState { documents = documents.plus(newDocument) }
+        setState { documents = documents.plus(newDocument); documentsChanged = filteredDocuments.isNotEmpty() }
     }
 
     private fun onRemoveDocument(removedDocument: Document) {
-        setState { documents = documents.minus(removedDocument) }
+        setState { documents = documents.minus(removedDocument); documentsChanged = filteredDocuments.isNotEmpty() }
+    }
+
+    private fun onFilterDocuments(newFilteredDocuments: List<FilteredDocument>) {
+        setState { documentsChanged = false; filteredDocuments = newFilteredDocuments }
+    }
+
+    private fun clearFilteredDocuments() {
+        setState { documentsChanged = false; filteredDocuments = emptyList() }
     }
 }

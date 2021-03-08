@@ -10,27 +10,23 @@ import com.ccfraser.muirwik.components.dialog.mDialogTitle
 import com.ccfraser.muirwik.components.list.mList
 import com.ccfraser.muirwik.components.mContainer
 import com.ccfraser.muirwik.components.mTypography
-import kotlinx.browser.window
-import kotlinx.css.Display
-import kotlinx.css.FlexDirection
-import kotlinx.css.display
-import kotlinx.css.flexDirection
+import kotlinx.css.*
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.asList
 import org.w3c.dom.events.Event
 import org.w3c.files.FileReader
 import react.*
-import ru.psu.web_ontology_doc_checker.model.Document
+import ru.psu.web_ontology_doc_checker.model.documents.Document
 import ru.psu.web_ontology_doc_checker.utils.openFileDialog
 import styled.css
 
 external interface DocumentListProps: RProps {
-    var documents: List<Document>
+    var documents: Collection<Document>
     var onDocumentAdded: (Document)->Unit
     var onDocumentRemoved: (Document)->Unit
 }
 
-private val documentLis = functionalComponent<DocumentListProps> { props ->
+private val documentList = functionalComponent<DocumentListProps> { props ->
     var selectedDocument by useState<Document?>(null)
     var showFileError by useState(false)
     mContainer {
@@ -43,7 +39,14 @@ private val documentLis = functionalComponent<DocumentListProps> { props ->
         })
         if (props.documents.isEmpty())
             mCard {
+                css {
+                    display = Display.flex
+                    flex(1.0, 1.0)
+                }
                 mCardContent {
+                    css {
+                        margin(LinearDimension.auto)
+                    }
                     mTypography("Список документов пуст")
                 }
             }
@@ -54,17 +57,19 @@ private val documentLis = functionalComponent<DocumentListProps> { props ->
             }
             documentDialog(selectedDocument, true) { selectedDocument = null }
         }
-        mDialog(showFileError, onClose = { _, _ -> showFileError = false }) {
-            mDialogTitle("Ошибка чтения файла")
-            mDialogContent {
-                mDialogContentText("Один из открываемых файлов не удалось открыть, увы-увы.")
+        if (showFileError) {
+            mDialog(true, onClose = { _, _ -> showFileError = false }) {
+                mDialogTitle("Ошибка чтения файла")
+                mDialogContent {
+                    mDialogContentText("Один из открываемых файлов не удалось открыть, увы-увы.")
+                }
             }
         }
     }
 }
 
-fun RBuilder.documentList(documents: List<Document>, onDocumentAdded: (Document)->Unit, onDocumentRemoved: (Document)->Unit) =
-    child(documentLis) {
+fun RBuilder.documentList(documents: Collection<Document>, onDocumentAdded: (Document)->Unit, onDocumentRemoved: (Document)->Unit) =
+    child(documentList) {
         attrs.documents = documents
         attrs.onDocumentAdded = onDocumentAdded
         attrs.onDocumentRemoved = onDocumentRemoved

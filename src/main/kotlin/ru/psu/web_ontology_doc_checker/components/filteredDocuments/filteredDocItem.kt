@@ -1,9 +1,7 @@
-package ru.psu.web_ontology_doc_checker.components.documents
+package ru.psu.web_ontology_doc_checker.components.filteredDocuments
 
-import com.ccfraser.muirwik.components.button.mIconButton
 import com.ccfraser.muirwik.components.list.mListItem
 import com.ccfraser.muirwik.components.list.mListItemAvatar
-import com.ccfraser.muirwik.components.list.mListItemSecondaryAction
 import com.ccfraser.muirwik.components.mAvatar
 import com.ccfraser.muirwik.components.mContainer
 import com.ccfraser.muirwik.components.mIcon
@@ -11,10 +9,10 @@ import com.ccfraser.muirwik.components.mTypography
 import kotlinx.css.*
 import kotlinx.css.properties.border
 import react.RBuilder
-import ru.psu.web_ontology_doc_checker.model.documents.Document
+import ru.psu.web_ontology_doc_checker.model.documents.FilteredDocument
 import styled.css
 
-fun RBuilder.documentItem(document: Document, onSelect: (Document) -> Unit, onDelete: (Document) -> Unit) {
+fun RBuilder.filteredDocItem(document: FilteredDocument, onSelect: (FilteredDocument) -> Unit) {
     mListItem(onClick = { onSelect(document)}) {
         css {
             hover {
@@ -23,7 +21,7 @@ fun RBuilder.documentItem(document: Document, onSelect: (Document) -> Unit, onDe
         }
         mListItemAvatar {
             mAvatar {
-                mIcon("receipt_long")
+                mIcon("summarize")
             }
         }
         mContainer {
@@ -32,9 +30,7 @@ fun RBuilder.documentItem(document: Document, onSelect: (Document) -> Unit, onDe
                 justifyContent = JustifyContent.center
             }
             mTypography(document.name)
-        }
-        mListItemSecondaryAction {
-            mIconButton("delete_forever", onClick = { onDelete(document) })
+            mTypography("Привязалось понятий: ${document.terms.size}; выбрано предложений: ${document.sentences.size}")
         }
     }
 }
