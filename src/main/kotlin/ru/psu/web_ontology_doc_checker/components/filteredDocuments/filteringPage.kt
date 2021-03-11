@@ -47,18 +47,17 @@ private val filteringPage = functionalComponent<FilteringPageProps> { props ->
                 }
             }
         } else {
-            mCardActionArea {
-                mCardActions {
-                    if (props.documentsChanged || props.filteredDocuments.isEmpty()) {
-                        mButton("Провести фильтрацию предложений документов", onClick = {
-                            processingDocuments = true
-                            val filteredDocuments = filterDocuments(props.documents, props.ontology)
-                            props.onFiltered(filteredDocuments)
-                        })
-                    }
-                    if (props.filteredDocuments.isNotEmpty()) {
-                        mButton("Очистить фильтрованные документы", onClick = { props.onClear() })
-                    }
+            mCardActions {
+                if (props.documentsChanged || props.filteredDocuments.isEmpty()) {
+                    mButton("Провести фильтрацию предложений документов", onClick = {
+                        processingDocuments = true
+                        val filteredDocuments = filterDocuments(props.documents, props.ontology)
+                        processingDocuments = false
+                        props.onFiltered(filteredDocuments)
+                    })
+                }
+                if (props.filteredDocuments.isNotEmpty()) {
+                    mButton("Очистить фильтрованные документы", onClick = { props.onClear() })
                 }
             }
             mCardContent {

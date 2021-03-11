@@ -21,8 +21,6 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
 
     implementation("com.ccfraser.muirwik:muirwik-components:0.6.3")
-
-    implementation(npm("natural", "4.0.0"))
 }
 
 kotlin {

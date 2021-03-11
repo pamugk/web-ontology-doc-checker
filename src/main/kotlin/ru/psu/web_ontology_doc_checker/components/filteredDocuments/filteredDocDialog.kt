@@ -30,14 +30,14 @@ fun RBuilder.filteredDocDialog(document: FilteredDocument?, fullscreen: Boolean,
                 mList {
                     mListSubheader("Привязавшиеся понятия")
                     for ((i, term) in document.terms.withIndex()) {
-                        mListItem(primaryText = "$i. $term", key = i.toString())
+                        mListItem(primaryText = "${i+1}. $term", key = i.toString())
                     }
                 }
                 mDivider(MDividerVariant.fullWidth)
                 mList {
                     mListSubheader("Предложения, содержащие привязавшиеся понятия")
-                    for ((i, doc) in document.sentences.withIndex()) {
-                        mListItem(primaryText = "$i. ${doc.text}", key = i.toString())
+                    for ((i, sentence) in document.sentences.withIndex()) {
+                        mListItem(primaryText = "${i+1}. $sentence", key = i.toString())
                     }
                 }
             }

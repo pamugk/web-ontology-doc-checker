@@ -26,7 +26,9 @@ fun RBuilder.filteredDocItem(document: FilteredDocument, onSelect: (FilteredDocu
         }
         mContainer {
             css {
+                alignItems = Align.center
                 display = Display.flex
+                flexDirection = FlexDirection.column
                 justifyContent = JustifyContent.center
             }
             mTypography(document.name)
