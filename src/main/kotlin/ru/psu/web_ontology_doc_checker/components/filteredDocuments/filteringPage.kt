@@ -51,7 +51,7 @@ private val filteringPage = functionalComponent<FilteringPageProps> { props ->
                 if (props.documentsChanged || props.filteredDocuments.isEmpty()) {
                     mButton("Провести фильтрацию предложений документов", onClick = {
                         processingDocuments = true
-                        val filteredDocuments = filterDocuments(props.documents, props.ontology)
+                        val filteredDocuments = filterDocuments(props.documents)
                         processingDocuments = false
                         props.onFiltered(filteredDocuments)
                     })

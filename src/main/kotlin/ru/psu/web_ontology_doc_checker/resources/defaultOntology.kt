@@ -1,6 +1,6 @@
 package ru.psu.web_ontology_doc_checker.resources
 
-val defaultOntology = """
+const val defaultOntology = """
 {
     "last_id": "227",
     "namespaces": {

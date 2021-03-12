@@ -9,7 +9,9 @@ import com.ccfraser.muirwik.components.list.mList
 import com.ccfraser.muirwik.components.list.mListItem
 import com.ccfraser.muirwik.components.list.mListSubheader
 import kotlinx.css.Display
+import kotlinx.css.FlexDirection
 import kotlinx.css.display
+import kotlinx.css.flexDirection
 import react.RBuilder
 import ru.psu.web_ontology_doc_checker.model.documents.FilteredDocument
 import styled.css
@@ -26,6 +28,7 @@ fun RBuilder.filteredDocDialog(document: FilteredDocument?, fullscreen: Boolean,
             mDialogContent {
                 css {
                     display = Display.flex
+                    flexDirection = FlexDirection.column
                 }
                 mList {
                     mListSubheader("Привязавшиеся понятия")
