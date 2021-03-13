@@ -6,9 +6,7 @@ import com.ccfraser.muirwik.components.list.mListItemAvatar
 import com.ccfraser.muirwik.components.list.mListItemSecondaryAction
 import com.ccfraser.muirwik.components.list.mListItemText
 import com.ccfraser.muirwik.components.mAvatar
-import com.ccfraser.muirwik.components.mContainer
 import com.ccfraser.muirwik.components.mIcon
-import com.ccfraser.muirwik.components.mTypography
 import kotlinx.css.*
 import kotlinx.css.properties.border
 import react.RBuilder

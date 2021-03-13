@@ -1,7 +1,6 @@
 package ru.psu.web_ontology_doc_checker.utils
 
 import kotlinx.browser.document
-import kotlinx.browser.window
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.MouseEvent
 import org.w3c.dom.url.URL
