@@ -2,13 +2,13 @@ package ru.psu.web_ontology_doc_checker.components.filteredDocuments
 
 import com.ccfraser.muirwik.components.button.mButton
 import com.ccfraser.muirwik.components.card.mCard
-import com.ccfraser.muirwik.components.card.mCardActionArea
 import com.ccfraser.muirwik.components.card.mCardActions
 import com.ccfraser.muirwik.components.card.mCardContent
 import com.ccfraser.muirwik.components.list.mList
 import com.ccfraser.muirwik.components.mTypography
 import kotlinx.css.*
 import react.*
+import ru.psu.web_ontology_doc_checker.components.loadingNotification
 import ru.psu.web_ontology_doc_checker.logic.filterDocuments
 import ru.psu.web_ontology_doc_checker.model.documents.Document
 import ru.psu.web_ontology_doc_checker.model.documents.FilteredDocument
@@ -84,7 +84,7 @@ private val filteringPage = functionalComponent<FilteringPageProps> { props ->
                     }
                 }
             }
-            filteringNotification(processingDocuments)
+            loadingNotification(processingDocuments, "Идёт обработка документов...")
             filteredDocDialog(selectedDocument, true) { selectedDocument = null}
         }
     }

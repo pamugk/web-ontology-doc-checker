@@ -1,4 +1,4 @@
-package ru.psu.web_ontology_doc_checker.components.filteredDocuments
+package ru.psu.web_ontology_doc_checker.components
 
 import com.ccfraser.muirwik.components.dialog.mDialog
 import com.ccfraser.muirwik.components.dialog.mDialogContent
@@ -11,10 +11,10 @@ import kotlinx.css.margin
 import react.RBuilder
 import styled.css
 
-fun RBuilder.filteringNotification(processingDocuments: Boolean) {
+fun RBuilder.loadingNotification(processingDocuments: Boolean, text: String) {
     if(processingDocuments) {
         mDialog(true) {
-            mDialogTitle("Идёт обработка документов...")
+            mDialogTitle(text)
             mDialogContent {
                 css {
                     display = Display.flex

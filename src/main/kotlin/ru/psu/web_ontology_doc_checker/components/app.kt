@@ -8,14 +8,16 @@ import kotlinx.css.*
 import react.*
 import ru.psu.web_ontology_doc_checker.components.documents.documentList
 import ru.psu.web_ontology_doc_checker.components.filteredDocuments.filteringPage
-import ru.psu.web_ontology_doc_checker.components.processors.rankingPage
+import ru.psu.web_ontology_doc_checker.components.rangedDocuments.rankingPage
 import ru.psu.web_ontology_doc_checker.model.documents.Document
 import ru.psu.web_ontology_doc_checker.model.documents.FilteredDocument
+import ru.psu.web_ontology_doc_checker.model.documents.RankedDocument
 import ru.psu.web_ontology_doc_checker.model.jont.Onto
 import ru.psu.web_ontology_doc_checker.utils.importOntology
 import styled.css
 
 class AppState(
+    var b: Int,
     var K: Int,
     var N: Int,
     var showDialog: Boolean,
@@ -26,6 +28,9 @@ class AppState(
 
     var filteredDocuments: List<FilteredDocument>,
     var filteredDocsChanged: Boolean,
+    var settingsChanged: Boolean,
+
+    var rankedDocuments: List<RankedDocument>,
 
     var ontology: Onto
 ): RState
@@ -38,6 +43,7 @@ class App(props: AppProps) : RComponent<AppProps, AppState>(props) {
 
     init {
         state = AppState(
+            b = 1,
             K = 1,
             N = 10,
             showDialog = false,
@@ -48,6 +54,9 @@ class App(props: AppProps) : RComponent<AppProps, AppState>(props) {
 
             filteredDocuments = emptyList(),
             filteredDocsChanged = false,
+            settingsChanged = false,
+
+            rankedDocuments = emptyList(),
 
             ontology = importOntology(props.ontology)
         )
@@ -86,14 +95,17 @@ class App(props: AppProps) : RComponent<AppProps, AppState>(props) {
                         state.ontology,
                         state.documents, state.documentsChanged, state.filteredDocuments,
                         ::onFilterDocuments, ::clearFilteredDocuments)
-                    Tabs.RANKING -> rankingPage(state.filteredDocuments, state.filteredDocsChanged, emptyList(), {})
+                    Tabs.RANKING -> rankingPage(
+                        state.ontology, state.filteredDocuments, state.filteredDocsChanged, state.settingsChanged,
+                        state.b, state.K, state.N, state.rankedDocuments, ::onRankDocuments)
                 }
             }
         }
-        settingsDialog(state.K, state.N, state.showDialog,
+        settingsDialog(state.b, state.K, state.N, state.showDialog,
             onClose = { setState { showDialog = false}},
-            onNChange = { value -> setState { N = value }},
-            onKChange = { value -> setState { K = value }})
+            onbChange = { value -> setState { b = value; settingsChanged = state.rankedDocuments.isNotEmpty() }},
+            onNChange = { value -> setState { N = value; settingsChanged = state.rankedDocuments.isNotEmpty() }},
+            onKChange = { value -> setState { K = value; settingsChanged = state.rankedDocuments.isNotEmpty() }})
     }
 
     private fun onAddDocument(newDocument: Document) {
@@ -105,10 +117,14 @@ class App(props: AppProps) : RComponent<AppProps, AppState>(props) {
     }
 
     private fun onFilterDocuments(newFilteredDocuments: List<FilteredDocument>) {
-        setState { documentsChanged = false; filteredDocuments = newFilteredDocuments }
+        setState { documentsChanged = false; filteredDocuments = newFilteredDocuments; filteredDocsChanged = rankedDocuments.isNotEmpty() }
     }
 
     private fun clearFilteredDocuments() {
-        setState { documentsChanged = false; filteredDocuments = emptyList() }
+        setState { documentsChanged = false; filteredDocuments = emptyList(); filteredDocsChanged = rankedDocuments.isNotEmpty() }
+    }
+
+    private fun onRankDocuments(newRankedDocuments: List<RankedDocument>) {
+        setState { filteredDocsChanged = false; rankedDocuments = newRankedDocuments }
     }
 }
