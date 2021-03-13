@@ -1,6 +1,5 @@
 # Project exclude paths
 /.gradle/
-/gradle/
 /build/
 /build/js/packages/web-ontology-doc-checker/kotlin/
 /.idea/
