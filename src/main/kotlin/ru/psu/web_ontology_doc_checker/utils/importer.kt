@@ -13,3 +13,7 @@ fun importOntology(ontoText: String): Onto {
 fun importDictionary(dictionary: String): List<TermInfo> {
     return Json.decodeFromString(serializer(), dictionary)
 }
+
+fun exportOntology(ontology: Onto): String {
+    return Json.encodeToString(serializer(), ontology)
+}

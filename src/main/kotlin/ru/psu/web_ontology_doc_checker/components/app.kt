@@ -13,7 +13,9 @@ import ru.psu.web_ontology_doc_checker.model.documents.Document
 import ru.psu.web_ontology_doc_checker.model.documents.FilteredDocument
 import ru.psu.web_ontology_doc_checker.model.documents.RankedDocument
 import ru.psu.web_ontology_doc_checker.model.jont.Onto
+import ru.psu.web_ontology_doc_checker.utils.exportOntology
 import ru.psu.web_ontology_doc_checker.utils.importOntology
+import ru.psu.web_ontology_doc_checker.utils.saveFileDialog
 import styled.css
 
 class AppState(
@@ -94,7 +96,7 @@ class App(props: AppProps) : RComponent<AppProps, AppState>(props) {
                     Tabs.FILTERING -> filteringPage(
                         state.ontology,
                         state.documents, state.documentsChanged, state.filteredDocuments,
-                        ::onFilterDocuments, ::clearFilteredDocuments)
+                        ::onFilterDocuments, ::clearFilteredDocuments, ::downloadFilteredDocsOntologies)
                     Tabs.RANKING -> rankingPage(
                         state.ontology, state.filteredDocuments, state.filteredDocsChanged, state.settingsChanged,
                         state.b, state.K, state.N, state.rankedDocuments, ::onRankDocuments)
@@ -123,6 +125,10 @@ class App(props: AppProps) : RComponent<AppProps, AppState>(props) {
 
     private fun clearFilteredDocuments() {
         setState { documentsChanged = false; filteredDocuments = emptyList(); filteredDocsChanged = rankedDocuments.isNotEmpty() }
+    }
+
+    private fun downloadFilteredDocsOntologies(filteredDocs: List<FilteredDocument>) {
+        filteredDocs.forEach { doc -> saveFileDialog(exportOntology(doc.boundOntology), "bound_${doc.name}.ont", "text/plain") }
     }
 
     private fun onRankDocuments(newRankedDocuments: List<RankedDocument>) {

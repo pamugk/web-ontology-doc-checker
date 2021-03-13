@@ -1,6 +1,7 @@
 package ru.psu.web_ontology_doc_checker.components.filteredDocuments
 
 import com.ccfraser.muirwik.components.button.mButton
+import com.ccfraser.muirwik.components.button.mIconButton
 import com.ccfraser.muirwik.components.card.mCard
 import com.ccfraser.muirwik.components.card.mCardActions
 import com.ccfraser.muirwik.components.card.mCardContent
@@ -22,6 +23,7 @@ external interface FilteringPageProps: RProps {
     var filteredDocuments: List<FilteredDocument>
     var onFiltered: (List<FilteredDocument>) -> Unit
     var onClear: () -> Unit
+    var onDownload: (List<FilteredDocument>) -> Unit
 }
 
 private val filteringPage = functionalComponent<FilteringPageProps> { props ->
@@ -58,6 +60,7 @@ private val filteringPage = functionalComponent<FilteringPageProps> { props ->
                 }
                 if (props.filteredDocuments.isNotEmpty()) {
                     mButton("Очистить фильтрованные документы", onClick = { props.onClear() })
+                    mIconButton("download", onClick = { props.onDownload(props.filteredDocuments) })
                 }
             }
             mCardContent {
@@ -78,7 +81,7 @@ private val filteringPage = functionalComponent<FilteringPageProps> { props ->
                     }
                     mList("Фильтрованные документы", true) {
                         for (document in props.filteredDocuments)
-                            filteredDocItem(document) { newlySelectedDocument ->
+                            filteredDocItem(document, { doc -> props.onDownload(listOf(doc))}) { newlySelectedDocument ->
                                 selectedDocument = newlySelectedDocument
                             }
                     }
@@ -94,7 +97,8 @@ fun RBuilder.filteringPage(
     ontology: Onto,
     documents: Collection<Document>, documentsChanged: Boolean,
     filteredDocuments: List<FilteredDocument>,
-    onFiltered: (List<FilteredDocument>) -> Unit, onClear: () -> Unit) =
+    onFiltered: (List<FilteredDocument>) -> Unit, onClear: () -> Unit,
+    onDownload: (List<FilteredDocument>) -> Unit) =
     child(filteringPage) {
         attrs.ontology = ontology
         attrs.documents = documents
@@ -102,4 +106,5 @@ fun RBuilder.filteringPage(
         attrs.filteredDocuments = filteredDocuments
         attrs.onFiltered = onFiltered
         attrs.onClear = onClear
+        attrs.onDownload = onDownload
     }

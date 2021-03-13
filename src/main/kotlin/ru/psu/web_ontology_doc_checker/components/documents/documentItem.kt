@@ -4,6 +4,7 @@ import com.ccfraser.muirwik.components.button.mIconButton
 import com.ccfraser.muirwik.components.list.mListItem
 import com.ccfraser.muirwik.components.list.mListItemAvatar
 import com.ccfraser.muirwik.components.list.mListItemSecondaryAction
+import com.ccfraser.muirwik.components.list.mListItemText
 import com.ccfraser.muirwik.components.mAvatar
 import com.ccfraser.muirwik.components.mContainer
 import com.ccfraser.muirwik.components.mIcon
@@ -26,12 +27,10 @@ fun RBuilder.documentItem(document: Document, onSelect: (Document) -> Unit, onDe
                 mIcon("receipt_long")
             }
         }
-        mContainer {
+        mListItemText(document.name) {
             css {
-                display = Display.flex
-                justifyContent = JustifyContent.center
+                textAlign = TextAlign.center
             }
-            mTypography(document.name)
         }
         mListItemSecondaryAction {
             mIconButton("delete_forever", onClick = { onDelete(document) })
