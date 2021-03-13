@@ -27,4 +27,12 @@ class Node(
      */
     @Transient
     val m_storage: MutableMap<String, Any> = mutableMapOf()
+
+    override fun equals(other: Any?): Boolean {
+        return other is Node && id == other.id
+    }
+
+    override fun hashCode(): Int {
+        return id
+    }
 }

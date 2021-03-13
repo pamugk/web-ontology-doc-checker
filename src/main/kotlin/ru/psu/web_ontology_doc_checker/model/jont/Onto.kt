@@ -3,8 +3,8 @@ package ru.psu.web_ontology_doc_checker.model.jont
 import kotlinx.serialization.Serializable
 
 @Serializable
-class Onto(val last_id: Int,
-           val namespaces:Map<String, String>,
+class Onto(val last_id: Int?,
+           val namespaces: Map<String, String>,
            val nodes: List<Node>,
            val relations: List<Link>,
            val visualize_ont_path: String?) {
@@ -44,6 +44,12 @@ class Onto(val last_id: Int,
     fun getNodesLinkedFrom(node: Node, linkName: String): List<Node> =
         relations.filter { link -> link.source_node_id == node.id && link.name == linkName }
             .mapNotNull { link -> getNodeByID(link.destination_node_id) }
+    /**
+     * @param node - node to find relations from.
+     * @return array of links, which are going out of node
+     */
+    fun getLinksFrom(node: Node): List<Link> =
+        relations.filter { link -> link.source_node_id == node.id }
 
     /**
      * @param node - node to find relations to.

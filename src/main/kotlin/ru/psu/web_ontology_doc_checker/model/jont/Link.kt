@@ -24,4 +24,13 @@ class Link(
      * @return attributes, stored exactly in this node.
      */
     val attributes: Map<String, String>,
-    val namespace: String)
+    val namespace: String) {
+
+    override fun equals(other: Any?): Boolean {
+        return other is Link && id == other.id
+    }
+
+    override fun hashCode(): Int {
+        return id
+    }
+}

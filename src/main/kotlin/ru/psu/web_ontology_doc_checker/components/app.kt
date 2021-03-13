@@ -109,7 +109,8 @@ class App(props: AppProps) : RComponent<AppProps, AppState>(props) {
     }
 
     private fun onAddDocument(newDocument: Document) {
-        setState { documents = documents.plus(newDocument); documentsChanged = filteredDocuments.isNotEmpty() }
+        val updated = state.documents.contains(newDocument)
+        setState { documents = documents.plus(newDocument); documentsChanged = updated && filteredDocuments.isNotEmpty() }
     }
 
     private fun onRemoveDocument(removedDocument: Document) {
