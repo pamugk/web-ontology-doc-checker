@@ -17,7 +17,7 @@ external interface RangingPageProps: RProps {
     var ontology: Onto
     var filteredDocuments: List<FilteredDocument>
     var filteredDocsChanged: Boolean; var settingsChanged: Boolean
-    var b: Int ; var N: Int ; var K:Int
+    var b: Int ; var N: Int ; var K:Int; var strict: Boolean
     var rankedDocuments: List<RankedDocument>
     var onRanked: (List<RankedDocument>) -> Unit
 }
@@ -39,9 +39,9 @@ private val rankingPage = functionalComponent<RangingPageProps> { props ->
             }
             if (props.filteredDocuments.isNotEmpty()) {
                 if (props.rankedDocuments.isEmpty() || props.settingsChanged || props.filteredDocsChanged) {
-                    mButton("Провести реранжирование", onClick = { e ->
+                    mButton("Провести ранжирование", onClick = { e ->
                         processingDocuments = true
-                        val rankedDocuments = rankDocuments(props.b, props.K, props.N, props.filteredDocuments)
+                        val rankedDocuments = rankDocuments(props.b, props.K, props.N, false, props.filteredDocuments)
                         processingDocuments = false
                         props.onRanked(rankedDocuments)
                     })
@@ -79,12 +79,12 @@ private val rankingPage = functionalComponent<RangingPageProps> { props ->
 fun RBuilder.rankingPage(
     ontology: Onto,
     filteredDocuments: List<FilteredDocument>, filteredDocsChanged: Boolean, settingsChanged: Boolean,
-    b: Int, N: Int, K:Int,
+    b: Int, N: Int, K:Int, strict: Boolean,
     rankedDocuments: List<RankedDocument>, onRanked: (List<RankedDocument>) -> Unit) =
     child(rankingPage) {
         attrs.ontology = ontology
         attrs.filteredDocuments = filteredDocuments
         attrs.filteredDocsChanged = filteredDocsChanged; attrs.settingsChanged = settingsChanged
-        attrs.b = b; attrs.N = N; attrs.K = K
+        attrs.b = b; attrs.N = N; attrs.K = K; attrs.strict = strict
         attrs.rankedDocuments = rankedDocuments; attrs.onRanked = onRanked
     }

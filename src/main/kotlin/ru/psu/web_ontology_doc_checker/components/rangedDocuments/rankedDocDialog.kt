@@ -39,6 +39,7 @@ fun RBuilder.rankedDocDialog(document: RankedDocument, fullscreen: Boolean, onCl
                             mTableCell("ui") { mTypography("Мощность понятия", MTypographyVariant.body2, align = MTypographyAlign.center) }
                             mTableCell("ei") { mTypography("Вес дуги", MTypographyVariant.body2, align = MTypographyAlign.center) }
                             mTableCell("bi*") { mTypography("Bi*", MTypographyVariant.body2, align = MTypographyAlign.center) }
+                            mTableCell("b*j") { mTypography("B*j", MTypographyVariant.body2, align = MTypographyAlign.center) }
                         }
                     }
                     mTableBody {
@@ -46,12 +47,13 @@ fun RBuilder.rankedDocDialog(document: RankedDocument, fullscreen: Boolean, onCl
                             mTableRow("row$i") {
                                 mTableCell("termi$i") { mTypography(pair.termFrom, MTypographyVariant.body2, align = MTypographyAlign.center) }
                                 mTableCell("termj$i") { mTypography(pair.termTo, MTypographyVariant.body2, align = MTypographyAlign.center) }
-                                mTableCell("sij$i") { mTypography("${pair.s}", MTypographyVariant.body2, align = MTypographyAlign.center) }
-                                mTableCell("s'ij$i") { mTypography("${pair.sNorm}", MTypographyVariant.body2, align = MTypographyAlign.center) }
+                                mTableCell("sij$i") { mTypography("${pair.rank}", MTypographyVariant.body2, align = MTypographyAlign.center) }
+                                mTableCell("s'ij$i") { mTypography("${pair.rankNorm}", MTypographyVariant.body2, align = MTypographyAlign.center) }
                                 mTableCell("pij$i") { mTypography("${pair.p}", MTypographyVariant.body2, align = MTypographyAlign.center) }
                                 mTableCell("ui$i") { mTypography("${pair.u}", MTypographyVariant.body2, align = MTypographyAlign.center) }
                                 mTableCell("ei$i") { mTypography("${pair.e}", MTypographyVariant.body2, align = MTypographyAlign.center) }
-                                mTableCell("bi*$i") { mTypography("${pair.b}", MTypographyVariant.body2, align = MTypographyAlign.center) }
+                                mTableCell("bi*$i") { mTypography("${pair.bi}", MTypographyVariant.body2, align = MTypographyAlign.center) }
+                                mTableCell("b*j$i") { mTypography("${pair.bj}", MTypographyVariant.body2, align = MTypographyAlign.center) }
                             }
                         }
                     }

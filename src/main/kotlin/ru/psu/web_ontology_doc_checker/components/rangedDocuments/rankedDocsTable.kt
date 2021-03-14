@@ -18,7 +18,7 @@ private val rankedDocsTable = functionalComponent<RankedDocsTableProps> { props 
         mTable {
             mTableHead {
                 mTableRow("row") {
-                    mTableCell("num") { mTypography("№", MTypographyVariant.body2, align = MTypographyAlign.center) }
+                    mTableCell("num") { mTypography("№", MTypographyVariant.body2) }
                     mTableCell("doc") { mTypography("Документ", MTypographyVariant.body2, align = MTypographyAlign.center) }
                     mTableCell("res") { mTypography("Оценка", MTypographyVariant.body2, align = MTypographyAlign.center) }
                 }

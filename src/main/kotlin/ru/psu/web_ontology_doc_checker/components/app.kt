@@ -22,6 +22,7 @@ class AppState(
     var b: Int,
     var K: Int,
     var N: Int,
+    var strict: Boolean,
     var showDialog: Boolean,
     var selectedTab: Any,
 
@@ -48,6 +49,7 @@ class App(props: AppProps) : RComponent<AppProps, AppState>(props) {
             b = 1,
             K = 1,
             N = 10,
+            strict = false,
             showDialog = false,
             selectedTab = Tabs.DOCUMENTS,
 
@@ -99,15 +101,16 @@ class App(props: AppProps) : RComponent<AppProps, AppState>(props) {
                         ::onFilterDocuments, ::clearFilteredDocuments, ::downloadFilteredDocsOntologies)
                     Tabs.RANKING -> rankingPage(
                         state.ontology, state.filteredDocuments, state.filteredDocsChanged, state.settingsChanged,
-                        state.b, state.K, state.N, state.rankedDocuments, ::onRankDocuments)
+                        state.b, state.K, state.N, state.strict, state.rankedDocuments, ::onRankDocuments)
                 }
             }
         }
-        settingsDialog(state.b, state.K, state.N, state.showDialog,
+        settingsDialog(state.b, state.K, state.N, state.strict, state.showDialog,
             onClose = { setState { showDialog = false}},
             onbChange = { value -> setState { b = value; settingsChanged = state.rankedDocuments.isNotEmpty() }},
             onNChange = { value -> setState { N = value; settingsChanged = state.rankedDocuments.isNotEmpty() }},
-            onKChange = { value -> setState { K = value; settingsChanged = state.rankedDocuments.isNotEmpty() }})
+            onKChange = { value -> setState { K = value; settingsChanged = state.rankedDocuments.isNotEmpty() }},
+            onStrictChange = { value -> setState { strict = value; settingsChanged = state.rankedDocuments.isNotEmpty()}})
     }
 
     private fun onAddDocument(newDocument: Document) {

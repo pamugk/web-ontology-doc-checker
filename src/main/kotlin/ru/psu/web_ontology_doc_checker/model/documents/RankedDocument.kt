@@ -2,8 +2,8 @@ package ru.psu.web_ontology_doc_checker.model.documents
 
 class RankedItem(
     val termFrom: String, val termTo: String,
-    val s: Double, val sNorm: Double, val p: Int,
-    val u: Double, val e: Double, val b: Double
+    val rank: Double, val rankNorm: Double, val p: Int,
+    val u: Double, val e: Double, val bi: Int, val bj: Int
 )
 
 class RankedDocument(
