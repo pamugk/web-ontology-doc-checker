@@ -7,6 +7,7 @@ import ru.psu.web_ontology_doc_checker.model.documents.Sentence
 import ru.psu.web_ontology_doc_checker.model.jont.Link
 import ru.psu.web_ontology_doc_checker.model.jont.Node
 import ru.psu.web_ontology_doc_checker.model.jont.Onto
+import kotlin.math.sqrt
 
 fun rankDocuments(b: Int, K: Int, N: Int, strictRange: Boolean, docs: List<FilteredDocument>): List<RankedDocument> {
     return docs.map { filteredDoc ->
@@ -33,14 +34,14 @@ private fun efreqRnum(b: Int, K: Int, N: Int, strictRange: Boolean, doc: Filtere
     val weightyLinksCount = countedConcordances.entries.filter { (_, count) -> count > b }.groupingBy { it.key.from }.eachCount()
     val avgWeights = weightyLinksCount.map { (term, count) -> term to 1.0 * count / doc.terms.size }.toMap()
     val rankedPairs = countedConcordances.keys.map { it to
-            concordanceCountedPaths[it]!! * 2.0 * avgWeights[it.from]!! * countedConcordances[it]!! /
+            sqrt(concordanceCountedPaths[it]!!.toDouble()) * 2.0 * avgWeights[it.from]!! * countedConcordances[it]!! /
             (weightyLinksCount[it.from]!! + weightyLinksCount[it.to]!!)
     }
     val ranks = rankedPairs.map { it.second }
     val minRank = ranks.minOrNull()!!; val maxRank = ranks.maxOrNull()!!
     return rankedPairs.sortedBy { it.first }
         .filterOutDuplicates()
-        .map { (pair, rank) -> RankedItem(pair.from, pair.to, rank, (rank - minRank) / maxRank, 0, avgWeights[pair.from]!!,
+        .map { (pair, rank) -> RankedItem(pair.from, pair.to, rank, (rank - minRank) / maxRank, concordanceCountedPaths[pair]!!, avgWeights[pair.from]!!,
         countedConcordances[pair]!!.toDouble(), weightyLinksCount[pair.from]!!, weightyLinksCount[pair.to]!! ) }
 }
 
@@ -101,7 +102,7 @@ private fun countPaths(from: String, to: String, ontology: Onto, N: Int): Int {
             path.removeFirst()
             continue
         }
-        val nextLink = ontology.getLinksFrom(path.first()).firstOrNull { link -> !traversedLinks.contains(link) }
+        val nextLink = ontology.getNodeLinks(path.first()).firstOrNull { link -> !traversedLinks.contains(link) }
         if (nextLink == null) {
             path.removeFirst()
             continue

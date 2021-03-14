@@ -40,7 +40,7 @@ private fun buildBoundOntology(boundTerms: Collection<String>, sourceOntology: O
                 path.removeFirst(); pathLinks.removeFirst()
                 continue
             }
-            val nextLink = sourceOntology.getLinksFrom(path.first()).firstOrNull { link -> !traversedLinks.contains(link) }
+            val nextLink = sourceOntology.getNodeLinks(path.first()).firstOrNull { link -> !traversedLinks.contains(link) }
             if (nextLink == null) {
                 path.removeFirst()
                 pathLinks.removeFirstOrNull()

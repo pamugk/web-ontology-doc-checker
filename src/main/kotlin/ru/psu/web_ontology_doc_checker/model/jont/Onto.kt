@@ -52,6 +52,13 @@ class Onto(val last_id: Int?,
         relations.filter { link -> link.source_node_id == node.id }
 
     /**
+     * @param node - node to find relations from.
+     * @return array of links, which are going out of or coming into node
+     */
+    fun getNodeLinks(node: Node): List<Link> =
+        relations.filter { link -> link.source_node_id == node.id || link.destination_node_id == node.id}
+
+    /**
      * @param node - node to find relations to.
      * @param linkName - name of the relation.
      * @return array of nodes, which are connected with the given one by the relation (link) with given name.
