@@ -36,28 +36,26 @@ private fun efreqRnum(b: Int, K: Int, N: Int, strictRange: Boolean, doc: Filtere
     val rankedPairs = countedConcordances.keys.filter { weightyLinksCount.containsKey(it.from) }.map { it to
             sqrt(concordanceCountedPaths[it]!!.toDouble()) * 2.0 * avgWeights[it.from]!! * countedConcordances[it]!! /
             (weightyLinksCount[it.from]!! + weightyLinksCount[it.to]!!)
-    }
-    val ranks = rankedPairs.map { it.second }
-    val minRank = ranks.minOrNull(); val maxRank = ranks.maxOrNull()
+    }.toMap()
+    val ranks = rankedPairs.map { it.value }
+    val minRank = ranks.minOrNull()?:0.0; val maxRank = ranks.maxOrNull()?:1.0
 
-    if (minRank == null || maxRank == null) {
-        return emptyList()
-    }
-
-    return rankedPairs.sortedBy { it.first }
+    return concordanceCountedPaths.keys.sortedBy { it }
         .filterOutDuplicates()
-        .map { (pair, rank) -> RankedItem(pair.from, pair.to, rank, (rank - minRank) / maxRank, concordanceCountedPaths[pair]!!, avgWeights[pair.from]!!,
-        countedConcordances[pair]!!.toDouble(), weightyLinksCount[pair.from]!!, weightyLinksCount[pair.to]!! ) }
+        .map { pair -> RankedItem(pair.from, pair.to,
+            rankedPairs[pair]?:0.0, (rankedPairs[pair]?:0.0 - minRank) / maxRank,
+            concordanceCountedPaths[pair]!!, avgWeights[pair.from]?:0.0,
+        countedConcordances[pair]!!.toDouble(), weightyLinksCount[pair.from]?:0, weightyLinksCount[pair.to]?:0 ) }
 }
 
-private fun List<Pair<Concordance, Double>>.filterOutDuplicates(): Map<Concordance, Double> {
-    val map = mutableMapOf<Concordance, Double>()
-    for ((pair, rank) in this) {
-        if (!map.contains(Concordance(pair.to, pair.from))) {
-            map[pair] = rank
+private fun List<Concordance>.filterOutDuplicates(): List<Concordance> {
+    val pairSet = mutableSetOf<Concordance>()
+    for (pair in this) {
+        if (!pairSet.contains(Concordance(pair.to, pair.from))) {
+            pairSet.add(pair)
         }
     }
-    return map
+    return pairSet.toList()
 }
 
 private fun buildConcordances(sentenceFrom: Sentence, sentenceTo: Sentence): List<Concordance> {
