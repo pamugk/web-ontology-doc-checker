@@ -35,7 +35,7 @@ private val documentList = functionalComponent<DocumentListProps> { props ->
             flexDirection = FlexDirection.column
         }
         mIconButton("add_circle_outline", onClick = {
-            openFileDialog { event -> handleFileInput(event, props.onDocumentAdded, { showFileError = true }) }
+            openFileDialog(true) { event -> handleFileInput(event, props.onDocumentAdded, { showFileError = true }) }
         })
         if (props.documents.isEmpty())
             mCard {

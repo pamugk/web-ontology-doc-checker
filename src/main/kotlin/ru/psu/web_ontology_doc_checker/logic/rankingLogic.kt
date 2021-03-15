@@ -4,7 +4,6 @@ import ru.psu.web_ontology_doc_checker.model.documents.FilteredDocument
 import ru.psu.web_ontology_doc_checker.model.documents.RankedDocument
 import ru.psu.web_ontology_doc_checker.model.documents.RankedItem
 import ru.psu.web_ontology_doc_checker.model.documents.Sentence
-import ru.psu.web_ontology_doc_checker.model.jont.Link
 import ru.psu.web_ontology_doc_checker.model.jont.Node
 import ru.psu.web_ontology_doc_checker.model.jont.Onto
 import kotlin.math.sqrt
@@ -12,7 +11,7 @@ import kotlin.math.sqrt
 fun rankDocuments(b: Int, K: Int, N: Int, strictRange: Boolean, docs: List<FilteredDocument>): List<RankedDocument> {
     return docs.map { filteredDoc ->
         val rankedItems = efreqRnum(b, K, N, strictRange, filteredDoc)
-        val result = rankedItems.sumOf { it.rankNorm } / rankedItems.size
+        val result = if (rankedItems.isNotEmpty()) rankedItems.sumOf { it.rankNorm } / rankedItems.size else 0.0
         return@map RankedDocument(filteredDoc.path, filteredDoc.name, rankedItems, result)
     }.sortedWith(compareBy({-it.result}, {it.name}))
 }
@@ -28,17 +27,23 @@ private infix fun String.with(that: String): Concordance = Concordance(this, tha
 
 private fun efreqRnum(b: Int, K: Int, N: Int, strictRange: Boolean, doc: FilteredDocument): List<RankedItem> {
     val concordances = if (strictRange) findPairsOfStrictlyConnectedTerms(K, doc) else findPairsOfConnectedTerms(K, doc)
-    val concordanceCountedPaths = concordances.distinct().map { it to countPaths(it.from, it.to, doc.boundOntology, N) }
+    val concordanceCountedPaths = concordances.distinct()
+        .map { it to countPaths(it.to, doc.boundOntology, N, ArrayDeque(listOf(doc.boundOntology.getFirstNodeByName(it.from)!!))) }
         .filter { it.second > 0 }.toMap()
     val countedConcordances = concordances.filter { concordanceCountedPaths.containsKey(it) }.groupingBy { it }.eachCount()
     val weightyLinksCount = countedConcordances.entries.filter { (_, count) -> count > b }.groupingBy { it.key.from }.eachCount()
     val avgWeights = weightyLinksCount.map { (term, count) -> term to 1.0 * count / doc.terms.size }.toMap()
-    val rankedPairs = countedConcordances.keys.map { it to
+    val rankedPairs = countedConcordances.keys.filter { weightyLinksCount.containsKey(it.from) }.map { it to
             sqrt(concordanceCountedPaths[it]!!.toDouble()) * 2.0 * avgWeights[it.from]!! * countedConcordances[it]!! /
             (weightyLinksCount[it.from]!! + weightyLinksCount[it.to]!!)
     }
     val ranks = rankedPairs.map { it.second }
-    val minRank = ranks.minOrNull()!!; val maxRank = ranks.maxOrNull()!!
+    val minRank = ranks.minOrNull(); val maxRank = ranks.maxOrNull()
+
+    if (minRank == null || maxRank == null) {
+        return emptyList()
+    }
+
     return rankedPairs.sortedBy { it.first }
         .filterOutDuplicates()
         .map { (pair, rank) -> RankedItem(pair.from, pair.to, rank, (rank - minRank) / maxRank, concordanceCountedPaths[pair]!!, avgWeights[pair.from]!!,
@@ -87,28 +92,19 @@ private fun findPairsOfStrictlyConnectedTerms(K: Int, doc: FilteredDocument): Li
     return pairsOfTerms
 }
 
-private fun countPaths(from: String, to: String, ontology: Onto, N: Int): Int {
-    val traversedLinks = mutableSetOf<Link>()
-    val path = ArrayDeque<Node>()
-    path.addFirst(ontology.getFirstNodeByName(from)!!)
-    var pathsCount = 0
-    do {
-        if (path.size - 1 > N) {
-            path.removeFirst()
-            continue
-        }
-        if (to == path.first().name) {
-            pathsCount++
-            path.removeFirst()
-            continue
-        }
-        val nextLink = ontology.getNodeLinks(path.first()).firstOrNull { link -> !traversedLinks.contains(link) }
-        if (nextLink == null) {
-            path.removeFirst()
-            continue
-        }
-        traversedLinks.add(nextLink)
-        path.addFirst(ontology.getNodeByID(nextLink.destination_node_id)!!)
-    } while (path.isNotEmpty())
-    return pathsCount
-}
+private fun countPaths(to: String, ontology: Onto, N: Int, path: ArrayDeque<Node>): Int =
+    if (path.size - 1 > N) 0
+    else {
+        if (to == path.first().name) 1
+        else ontology
+            .getNodesLinkedFrom(path.first())
+            .plus(ontology.getNodesLinkedTo(path.first()))
+            .filter { node -> !path.contains(node) }
+            .map { node ->
+                path.addFirst(node)
+                val count = countPaths(to, ontology, N, path)
+                path.removeFirst()
+                return@map count
+            }
+            .sum()
+    }

@@ -7,10 +7,12 @@ import org.w3c.dom.url.URL
 import org.w3c.files.Blob
 import org.w3c.files.BlobPropertyBag
 
-fun openFileDialog(callback: (Event) -> Unit) {
+fun openFileDialog( mutiple: Boolean, callback: (Event) -> Unit) {
     val input = document.createElement("input")
     input.setAttribute("type", "file")
-    input.setAttribute("multiple", "multiple")
+    if (mutiple) {
+        input.setAttribute("multiple", "multiple")
+    }
     input.addEventListener("change", callback)
     input.dispatchEvent(MouseEvent("click"))
 }

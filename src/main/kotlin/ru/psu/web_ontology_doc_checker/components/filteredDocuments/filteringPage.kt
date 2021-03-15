@@ -18,6 +18,7 @@ import styled.css
 
 external interface FilteringPageProps: RProps {
     var ontology: Onto
+    var N: Int
     var documents: Collection<Document>
     var documentsChanged: Boolean
     var filteredDocuments: List<FilteredDocument>
@@ -53,7 +54,7 @@ private val filteringPage = functionalComponent<FilteringPageProps> { props ->
                 if (props.documentsChanged || props.filteredDocuments.isEmpty()) {
                     mButton("Провести фильтрацию предложений документов", onClick = {
                         processingDocuments = true
-                        val filteredDocuments = filterDocuments(props.documents, props.ontology)
+                        val filteredDocuments = filterDocuments(props.documents, props.ontology, props.N)
                         processingDocuments = false
                         props.onFiltered(filteredDocuments)
                     })
@@ -94,13 +95,14 @@ private val filteringPage = functionalComponent<FilteringPageProps> { props ->
 }
 
 fun RBuilder.filteringPage(
-    ontology: Onto,
+    ontology: Onto, N: Int,
     documents: Collection<Document>, documentsChanged: Boolean,
     filteredDocuments: List<FilteredDocument>,
     onFiltered: (List<FilteredDocument>) -> Unit, onClear: () -> Unit,
     onDownload: (List<FilteredDocument>) -> Unit) =
     child(filteringPage) {
         attrs.ontology = ontology
+        attrs.N = N
         attrs.documents = documents
         attrs.documentsChanged = documentsChanged
         attrs.filteredDocuments = filteredDocuments

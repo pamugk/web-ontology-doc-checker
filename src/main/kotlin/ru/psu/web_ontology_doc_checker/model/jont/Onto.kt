@@ -44,6 +44,11 @@ class Onto(val last_id: Int?,
     fun getNodesLinkedFrom(node: Node, linkName: String): List<Node> =
         relations.filter { link -> link.source_node_id == node.id && link.name == linkName }
             .mapNotNull { link -> getNodeByID(link.destination_node_id) }
+
+    fun getNodesLinkedFrom(node: Node): List<Node> =
+        relations.filter { link -> link.source_node_id == node.id }
+            .mapNotNull { link -> getNodeByID(link.destination_node_id) }
+
     /**
      * @param node - node to find relations from.
      * @return array of links, which are going out of node
@@ -66,6 +71,10 @@ class Onto(val last_id: Int?,
      */
     fun getNodesLinkedTo(node: Node, linkName: String): List<Node> =
         relations.filter { link -> link.destination_node_id == node.id && link.name == linkName }
+            .mapNotNull { link -> getNodeByID(link.source_node_id) }
+
+    fun getNodesLinkedTo(node: Node): List<Node> =
+        relations.filter { link -> link.destination_node_id == node.id }
             .mapNotNull { link -> getNodeByID(link.source_node_id) }
 
     /**

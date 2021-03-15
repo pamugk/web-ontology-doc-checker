@@ -25,7 +25,7 @@ private val rankedDocsTable = functionalComponent<RankedDocsTableProps> { props 
             }
             mTableBody {
                 for ((i, doc) in props.rankedDocuments.withIndex()) {
-                    mTableRow("row$i") {
+                    mTableRow("row$i", onClick = { selectedDoc = doc }) {
                         mTableCell("num$i") { mTypography("${i+1}", MTypographyVariant.body2) }
                         mTableCell("doc$i") { mTypography(doc.name, MTypographyVariant.body2, align = MTypographyAlign.center) }
                         mTableCell("res$i") { mTypography("${doc.result}", MTypographyVariant.body2, align = MTypographyAlign.center) }

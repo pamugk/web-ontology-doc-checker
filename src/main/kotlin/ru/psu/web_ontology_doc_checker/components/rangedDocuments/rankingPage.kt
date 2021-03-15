@@ -39,7 +39,7 @@ private val rankingPage = functionalComponent<RangingPageProps> { props ->
             }
             if (props.filteredDocuments.isNotEmpty()) {
                 if (props.rankedDocuments.isEmpty() || props.settingsChanged || props.filteredDocsChanged) {
-                    mButton("Провести ранжирование", onClick = { e ->
+                    mButton("Провести ранжирование", onClick = { _ ->
                         processingDocuments = true
                         val rankedDocuments = rankDocuments(props.b, props.K, props.N, false, props.filteredDocuments)
                         processingDocuments = false

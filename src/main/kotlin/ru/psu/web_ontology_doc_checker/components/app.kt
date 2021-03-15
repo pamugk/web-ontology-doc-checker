@@ -4,7 +4,12 @@ import com.ccfraser.muirwik.components.*
 import com.ccfraser.muirwik.components.button.mIconButton
 import com.ccfraser.muirwik.components.card.mCard
 import com.ccfraser.muirwik.components.card.mCardContent
+import kotlinx.browser.window
 import kotlinx.css.*
+import org.w3c.dom.HTMLInputElement
+import org.w3c.dom.events.Event
+import org.w3c.files.FileReader
+import org.w3c.files.get
 import react.*
 import ru.psu.web_ontology_doc_checker.components.documents.documentList
 import ru.psu.web_ontology_doc_checker.components.filteredDocuments.filteringPage
@@ -13,8 +18,10 @@ import ru.psu.web_ontology_doc_checker.model.documents.Document
 import ru.psu.web_ontology_doc_checker.model.documents.FilteredDocument
 import ru.psu.web_ontology_doc_checker.model.documents.RankedDocument
 import ru.psu.web_ontology_doc_checker.model.jont.Onto
+import ru.psu.web_ontology_doc_checker.resources.defaultOntology
 import ru.psu.web_ontology_doc_checker.utils.exportOntology
 import ru.psu.web_ontology_doc_checker.utils.importOntology
+import ru.psu.web_ontology_doc_checker.utils.openFileDialog
 import ru.psu.web_ontology_doc_checker.utils.saveFileDialog
 import styled.css
 
@@ -69,12 +76,14 @@ class App(props: AppProps) : RComponent<AppProps, AppState>(props) {
     override fun RBuilder.render() {
         mAppBar(position = MAppBarPosition.sticky) {
             mToolbar {
-                mTypography("Онтологический упорядочиватель документов") {}
-                mIconButton("settings", onClick = { setState { showDialog = true } }) {
+                mTypography("Онтологический упорядочиватель документов")
+                mIconButton("history", onClick = { changeOntology(defaultOntology) }) {
                     css {
                         marginLeft = LinearDimension.auto
                     }
                 }
+                mIconButton("upload", onClick = { openFileDialog(false) { e -> handleFileInput(e) } })
+                mIconButton("settings", onClick = { setState { showDialog = true } })
             }
         }
         mCard {
@@ -96,7 +105,7 @@ class App(props: AppProps) : RComponent<AppProps, AppState>(props) {
                 when (state.selectedTab) {
                     Tabs.DOCUMENTS -> documentList(state.documents, ::onAddDocument, ::onRemoveDocument)
                     Tabs.FILTERING -> filteringPage(
-                        state.ontology,
+                        state.ontology, state.N,
                         state.documents, state.documentsChanged, state.filteredDocuments,
                         ::onFilterDocuments, ::clearFilteredDocuments, ::downloadFilteredDocsOntologies)
                     Tabs.RANKING -> rankingPage(
@@ -111,6 +120,19 @@ class App(props: AppProps) : RComponent<AppProps, AppState>(props) {
             onNChange = { value -> setState { N = value; settingsChanged = state.rankedDocuments.isNotEmpty() }},
             onKChange = { value -> setState { K = value; settingsChanged = state.rankedDocuments.isNotEmpty() }},
             onStrictChange = { value -> setState { strict = value; settingsChanged = state.rankedDocuments.isNotEmpty()}})
+    }
+
+    private fun handleFileInput(event: Event) {
+        val input = event.target as? HTMLInputElement ?: return
+        val file = input.files!!.get(0)!!
+        val fReader = FileReader()
+        fReader.onloadend = { _ -> window.alert("Онтология загружена"); changeOntology(fReader.result as String) }
+        fReader.onerror = { _ -> window.alert("Загрузка онтологии не удалась, попробуйте ещё раз") }
+        fReader.readAsText(file)
+    }
+
+    private fun changeOntology(ontologyText: String) {
+        setState { ontology = importOntology(ontologyText); filteredDocuments = emptyList(); rankedDocuments = emptyList() }
     }
 
     private fun onAddDocument(newDocument: Document) {
