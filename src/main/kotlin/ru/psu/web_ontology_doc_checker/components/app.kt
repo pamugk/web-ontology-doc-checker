@@ -157,6 +157,6 @@ class App(props: AppProps) : RComponent<AppProps, AppState>(props) {
     }
 
     private fun onRankDocuments(newRankedDocuments: List<RankedDocument>) {
-        setState { filteredDocsChanged = false; rankedDocuments = newRankedDocuments }
+        setState { filteredDocsChanged = false; settingsChanged = false; rankedDocuments = newRankedDocuments }
     }
 }
