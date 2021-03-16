@@ -33,8 +33,8 @@ private fun efreqRnum(b: Int, K: Int, N: Int, strictRange: Boolean, doc: Filtere
     val countedConcordances = concordances.filter { concordanceCountedPaths.containsKey(it) }.groupingBy { it }.eachCount()
     val weightyLinksCount = countedConcordances.entries.filter { (_, count) -> count > b }.groupingBy { it.key.from }.eachCount()
     val avgWeights = weightyLinksCount.map { (term, count) -> term to 1.0 * count / doc.terms.size }.toMap()
-    val rankedPairs = countedConcordances.keys.filter { weightyLinksCount.containsKey(it.from) }.map { it to
-            sqrt(concordanceCountedPaths[it]!!.toDouble()) * 2.0 * avgWeights[it.from]!! * countedConcordances[it]!! /
+    val rankedPairs = countedConcordances.keys.filter { weightyLinksCount.containsKey(it.from) && weightyLinksCount.containsKey(it.to) }.map { it to
+            sqrt((concordanceCountedPaths[it]?:0.0).toDouble()) * 2.0 * (avgWeights[it.from]?:0.0) * (countedConcordances[it]?:0) /
             (weightyLinksCount[it.from]!! + weightyLinksCount[it.to]!!)
     }.toMap()
     val ranks = rankedPairs.map { it.value }
