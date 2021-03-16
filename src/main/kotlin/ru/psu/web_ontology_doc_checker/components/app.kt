@@ -110,7 +110,7 @@ class App(props: AppProps) : RComponent<AppProps, AppState>(props) {
                         ::onFilterDocuments, ::clearFilteredDocuments, ::downloadFilteredDocsOntologies)
                     Tabs.RANKING -> rankingPage(
                         state.ontology, state.filteredDocuments, state.filteredDocsChanged, state.settingsChanged,
-                        state.b, state.K, state.N, state.strict, state.rankedDocuments, ::onRankDocuments)
+                        state.b, state.N, state.K, state.strict, state.rankedDocuments, ::onRankDocuments)
                 }
             }
         }
