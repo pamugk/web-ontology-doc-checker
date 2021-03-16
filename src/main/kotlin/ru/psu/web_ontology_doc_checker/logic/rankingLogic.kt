@@ -78,13 +78,14 @@ private fun findPairsOfConnectedTerms(K: Int, doc: FilteredDocument): List<Conco
 
 private fun findPairsOfStrictlyConnectedTerms(K: Int, doc: FilteredDocument): List<Concordance> {
     val pairsOfTerms = mutableListOf<Concordance>()
-    for (i in doc.sentences.sortedBy { it.number }.indices) {
+    val sortedSentences = doc.sentences.sortedBy { it.number }
+    for (i in sortedSentences.indices) {
         var j = i
-        while(j < doc.sentences.size && doc.sentences[j].number - doc.sentences[i].number != K) {
+        while(j < sortedSentences.size && sortedSentences[j].number - sortedSentences[i].number != K) {
             j++
         }
         if (j != doc.sentences.size) {
-            pairsOfTerms.addAll(buildConcordances(doc.sentences[i], doc.sentences[j]))
+            pairsOfTerms.addAll(buildConcordances(sortedSentences[i], sortedSentences[j]))
         }
     }
     return pairsOfTerms
