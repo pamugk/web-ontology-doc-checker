@@ -27,6 +27,7 @@ fun RBuilder.filteredDocItem(document: FilteredDocument, onSelect: (FilteredDocu
         }
         mListItemText(document.name, "Привязалось понятий: ${document.terms.size}; выбрано предложений: ${document.sentences.size}") {
             css {
+                cursor = Cursor.default
                 textAlign = TextAlign.center
             }
         }

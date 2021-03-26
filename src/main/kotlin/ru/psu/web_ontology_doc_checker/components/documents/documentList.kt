@@ -1,14 +1,13 @@
 package ru.psu.web_ontology_doc_checker.components.documents
 
 import com.ccfraser.muirwik.components.button.mIconButton
-import com.ccfraser.muirwik.components.card.mCard
+import com.ccfraser.muirwik.components.card.mCardActions
 import com.ccfraser.muirwik.components.card.mCardContent
 import com.ccfraser.muirwik.components.dialog.mDialog
 import com.ccfraser.muirwik.components.dialog.mDialogContent
 import com.ccfraser.muirwik.components.dialog.mDialogContentText
 import com.ccfraser.muirwik.components.dialog.mDialogTitle
 import com.ccfraser.muirwik.components.list.mList
-import com.ccfraser.muirwik.components.mContainer
 import com.ccfraser.muirwik.components.mTypography
 import kotlinx.css.*
 import org.w3c.dom.HTMLInputElement
@@ -29,27 +28,21 @@ external interface DocumentListProps: RProps {
 private val documentList = functionalComponent<DocumentListProps> { props ->
     var selectedDocument by useState<Document?>(null)
     var showFileError by useState(false)
-    mContainer {
-        css {
-            display = Display.flex
-            flexDirection = FlexDirection.column
-        }
+
+    mCardActions {
         mIconButton("add_circle_outline", onClick = {
             openFileDialog(true) { event -> handleFileInput(event, props.onDocumentAdded, { showFileError = true }) }
         })
-        if (props.documents.isEmpty())
-            mCard {
-                css {
-                    display = Display.flex
-                    flex(1.0, 1.0)
-                }
-                mCardContent {
-                    css {
-                        margin(LinearDimension.auto)
-                    }
-                    mTypography("Список документов пуст")
-                }
-            }
+    }
+    mCardContent {
+        css {
+            display = Display.flex
+            flex(1.0, 1.0)
+            flexDirection = FlexDirection.column
+        }
+        if (props.documents.isEmpty()) {
+            mTypography("Список документов пуст")
+        }
         else {
             mList {
                 for (document in props.documents)
@@ -57,12 +50,12 @@ private val documentList = functionalComponent<DocumentListProps> { props ->
             }
             documentDialog(selectedDocument, true) { selectedDocument = null }
         }
-        if (showFileError) {
-            mDialog(true, onClose = { _, _ -> showFileError = false }) {
-                mDialogTitle("Ошибка чтения файла")
-                mDialogContent {
-                    mDialogContentText("Один из открываемых файлов не удалось открыть, увы-увы.")
-                }
+    }
+    if (showFileError) {
+        mDialog(true, onClose = { _, _ -> showFileError = false }) {
+            mDialogTitle("Ошибка чтения файла")
+            mDialogContent {
+                mDialogContentText("Один из открываемых файлов не удалось открыть, увы-увы.")
             }
         }
     }

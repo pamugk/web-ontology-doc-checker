@@ -8,9 +8,9 @@ import ru.psu.web_ontology_doc_checker.model.jont.Node
 import ru.psu.web_ontology_doc_checker.model.jont.Onto
 import kotlin.math.sqrt
 
-fun rankDocuments(b: Int, K: Int, N: Int, strictRange: Boolean, docs: List<FilteredDocument>): List<RankedDocument> {
+fun rankDocuments(b: Int, N: Int, K: Int, strictRange: Boolean, docs: List<FilteredDocument>): List<RankedDocument> {
     return docs.map { filteredDoc ->
-        val rankedItems = efreqRnum(b, K, N, strictRange, filteredDoc)
+        val rankedItems = efreqRnum(b, N, K, strictRange, filteredDoc)
         val result = if (rankedItems.isNotEmpty()) rankedItems.sumOf { it.rankNorm } / rankedItems.size else 0.0
         return@map RankedDocument(filteredDoc.path, filteredDoc.name, rankedItems, result)
     }.sortedWith(compareBy({-it.result}, {it.name}))
@@ -25,7 +25,7 @@ private data class Concordance(val from: String, val to: String): Comparable<Con
 
 private infix fun String.with(that: String): Concordance = Concordance(this, that)
 
-private fun efreqRnum(b: Int, K: Int, N: Int, strictRange: Boolean, doc: FilteredDocument): List<RankedItem> {
+private fun efreqRnum(b: Int, N: Int, K: Int, strictRange: Boolean, doc: FilteredDocument): List<RankedItem> {
     val concordances = if (strictRange) findPairsOfStrictlyConnectedTerms(K, doc) else findPairsOfConnectedTerms(K, doc)
     val concordanceCountedPaths = concordances.distinct()
         .map { it to countPaths(it.to, doc.boundOntology, N, ArrayDeque(listOf(doc.boundOntology.getFirstNodeByName(it.from)!!))) }

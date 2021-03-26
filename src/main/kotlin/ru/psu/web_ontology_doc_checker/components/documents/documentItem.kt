@@ -27,6 +27,7 @@ fun RBuilder.documentItem(document: Document, onSelect: (Document) -> Unit, onDe
         }
         mListItemText(document.name) {
             css {
+                cursor = Cursor.default
                 textAlign = TextAlign.center
             }
         }
