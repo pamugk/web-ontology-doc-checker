@@ -7,6 +7,7 @@ import com.ccfraser.muirwik.components.list.mListItemSecondaryAction
 import com.ccfraser.muirwik.components.list.mListItemText
 import com.ccfraser.muirwik.components.mAvatar
 import com.ccfraser.muirwik.components.mIcon
+import com.ccfraser.muirwik.components.mTooltip
 import kotlinx.css.*
 import kotlinx.css.properties.border
 import react.RBuilder
@@ -32,7 +33,9 @@ fun RBuilder.documentItem(document: Document, onSelect: (Document) -> Unit, onDe
             }
         }
         mListItemSecondaryAction {
-            mIconButton("delete_forever", onClick = { onDelete(document) })
+            mTooltip("Удалить документ из корпуса") {
+                mIconButton("delete_forever", onClick = { onDelete(document) })
+            }
         }
     }
 }

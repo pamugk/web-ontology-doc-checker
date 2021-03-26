@@ -8,6 +8,7 @@ import com.ccfraser.muirwik.components.dialog.mDialogContent
 import com.ccfraser.muirwik.components.dialog.mDialogContentText
 import com.ccfraser.muirwik.components.dialog.mDialogTitle
 import com.ccfraser.muirwik.components.list.mList
+import com.ccfraser.muirwik.components.mTooltip
 import com.ccfraser.muirwik.components.mTypography
 import kotlinx.css.*
 import org.w3c.dom.HTMLInputElement
@@ -30,9 +31,11 @@ private val documentList = functionalComponent<DocumentListProps> { props ->
     var showFileError by useState(false)
 
     mCardActions {
-        mIconButton("add_circle_outline", onClick = {
-            openFileDialog(true) { event -> handleFileInput(event, props.onDocumentAdded, { showFileError = true }) }
-        })
+        mTooltip("Добавить документ в корпус") {
+            mIconButton("add_circle_outline", onClick = {
+                openFileDialog(true) { event -> handleFileInput(event, props.onDocumentAdded, { showFileError = true }) }
+            })
+        }
     }
     mCardContent {
         css {

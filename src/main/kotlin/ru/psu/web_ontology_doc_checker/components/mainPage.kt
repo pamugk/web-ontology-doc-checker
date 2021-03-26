@@ -28,14 +28,21 @@ import styled.css
 
 enum class Steps(val description: String) {
     DOCUMENT_COLLECTION("Выбор корпуса документов"),
-    DOCUMENTS("Просмотр документы"),
+    DOCUMENTS("Просмотр документов"),
     ONTOLOGY("Выбор управляющей онтологии"),
     SETTINGS("Предварительная настройка"),
     FILTER("Классификация документов"),
-    FILTERED_DOCUMENTS("Просмотр классифицированных документов"),
+    FILTERED_DOCUMENTS("Просмотр результатов классификации"),
     RANK("Ранжирование"),
     RANKED_DOCUMENTS("Просмотр ранжированных документов")
 }
+
+private val orderOfSteps = listOf(
+    Steps.DOCUMENT_COLLECTION, Steps.DOCUMENTS,
+    Steps.ONTOLOGY, Steps.SETTINGS,
+    Steps.FILTER, Steps.FILTERED_DOCUMENTS,
+    Steps.RANK, Steps.RANKED_DOCUMENTS
+)
 
 private fun handleFileInput(event: Event, onChangeOntology: (Onto) -> Unit) {
     val input = event.target as? HTMLInputElement ?: return
@@ -65,9 +72,7 @@ class MainPage: RComponent<RProps, MainPageState>() {
     init {
         state = MainPageState(
             Steps.DOCUMENT_COLLECTION, false,
-
             1, 10, 1, false,
-
             null, emptySet(), emptyList(), emptyList()
         )
     }
@@ -80,7 +85,19 @@ class MainPage: RComponent<RProps, MainPageState>() {
                 flexDirection = FlexDirection.column
             }
             mCardContent {
-                mTypography("Текущий шаг: \"${state.currentStep.description}\"")
+                css {
+                    display = Display.flex
+                    flexDirection = FlexDirection.column
+                }
+                if (state.currentStep != orderOfSteps[0]) {
+                    mTypography("Предыдущий шаг: \"${orderOfSteps[orderOfSteps.indexOf(state.currentStep) - 1].description}\"")
+                }
+                mTypography("Текущий шаг: \"${state.currentStep.description}\"") {
+                    css { fontWeight = FontWeight.bold }
+                }
+                if (state.currentStep != orderOfSteps[orderOfSteps.lastIndex]) {
+                    mTypography("Следующий шаг: \"${orderOfSteps[orderOfSteps.indexOf(state.currentStep) + 1].description}\"")
+                }
             }
             when(state.currentStep) {
                 Steps.DOCUMENT_COLLECTION -> documentCollectionPage { documentCollection ->
@@ -156,23 +173,13 @@ class MainPage: RComponent<RProps, MainPageState>() {
                             }
                         })
                     mButton("Далее",
-                        disabled = state.processing || state.currentStep == Steps.RANKED_DOCUMENTS
+                        disabled = state.processing || state.currentStep == orderOfSteps[orderOfSteps.lastIndex]
                                 || state.currentStep == Steps.DOCUMENTS && state.documents.isEmpty()
                                 || state.currentStep == Steps.ONTOLOGY && state.ontology == null
                                 || state.currentStep == Steps.FILTER && state.filteredDocuments.isEmpty()
                                 || state.currentStep == Steps.RANK && state.rankedDocuments.isEmpty(),
                         onClick = {
-                            setState { currentStep = when(currentStep) {
-                                Steps.DOCUMENT_COLLECTION -> Steps.DOCUMENTS
-                                Steps.DOCUMENTS -> Steps.ONTOLOGY
-                                Steps.ONTOLOGY -> Steps.SETTINGS
-                                Steps.SETTINGS -> Steps.FILTER
-                                Steps.FILTER -> Steps.FILTERED_DOCUMENTS
-                                Steps.FILTERED_DOCUMENTS -> Steps.RANK
-                                Steps.RANK -> Steps.RANKED_DOCUMENTS
-                                Steps.RANKED_DOCUMENTS -> TODO()
-                            }
-                            }
+                            setState { currentStep = orderOfSteps[orderOfSteps.indexOf(currentStep) + 1] }
                         })
                 }
             }

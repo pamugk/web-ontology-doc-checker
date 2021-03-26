@@ -40,13 +40,13 @@ private val filteredDocsList = functionalComponent<FilteringPageProps> { props -
             flexDirection = FlexDirection.column
         }
         if (props.filteredDocuments.isEmpty()) {
-            mTypography("Нет документов, связанных с исследуемой ПрО :( ") {
+            mTypography("Нет документов, связанных с ПрО, которую описывает выбранная онтология :( ") {
                 css {
                     margin(LinearDimension.auto)
                 }
             }
         } else {
-            mList("Фильтрованные документы", true) {
+            mList("Документы, близкие к ПрО, которую описывает выбранная онтология", true) {
                 for (document in props.filteredDocuments)
                     filteredDocItem(document, { doc -> onDownload(listOf(doc))}) { newlySelectedDocument ->
                         selectedDocument = newlySelectedDocument

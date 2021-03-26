@@ -2,18 +2,23 @@ package ru.psu.web_ontology_doc_checker.components
 
 import com.ccfraser.muirwik.components.MTypographyAlign
 import com.ccfraser.muirwik.components.MTypographyVariant
+import com.ccfraser.muirwik.components.button.mIconButton
 import com.ccfraser.muirwik.components.dialog.mDialogContent
+import com.ccfraser.muirwik.components.mContainer
 import com.ccfraser.muirwik.components.mTypography
 import com.ccfraser.muirwik.components.table.*
-import kotlinx.css.Display
-import kotlinx.css.FlexDirection
-import kotlinx.css.display
-import kotlinx.css.flexDirection
-import react.RBuilder
+import kotlinx.css.*
+import react.*
 import ru.psu.web_ontology_doc_checker.logic.terms
 import styled.css
+import kotlin.math.ceil
+import kotlin.math.min
 
-fun RBuilder.dictionaryPage() {
+private const val termsPerPage = 5
+
+private val dictionaryPage = functionalComponent<RProps> {
+    var page by useState(0)
+
     mDialogContent {
         css {
             display = Display.flex
@@ -29,15 +34,30 @@ fun RBuilder.dictionaryPage() {
                     }
                 }
                 mTableBody {
-                    for ((i, term) in terms.withIndex()) {
+                    for (i in page * termsPerPage until min((page + 1) * termsPerPage, terms.size)) {
                         mTableRow("row$i") {
-                            mTableCell("term$i") { mTypography(term.term, MTypographyVariant.body2) }
+                            mTableCell("term$i") { mTypography(terms[i].term, MTypographyVariant.body2) }
                             mTableCell("forms$i") {
-                                for (form in term.forms) {
-                                    mTypography(form, MTypographyVariant.body2, align = MTypographyAlign.center)
-                                }
+                                mTypography(terms[i].forms.joinToString("; "), MTypographyVariant.body2, align = MTypographyAlign.center)
                             }
-                            mTableCell("def$i") { mTypography(term.definition, MTypographyVariant.body2, align = MTypographyAlign.center) }
+                            mTableCell("def$i") { mTypography(terms[i].definition, MTypographyVariant.body2, align = MTypographyAlign.center) }
+                        }
+                    }
+                }
+                mTableFooter {
+                    mTableRow {
+                        mTableCell {
+                            mContainer {
+                                css {
+                                    display = Display.flex
+                                    minWidth = LinearDimension.maxContent
+                                    alignItems = Align.center
+                                }
+                                mTypography("${page * termsPerPage + 1}-${(page + 1) * termsPerPage} из ${terms.size}")
+                                mIconButton("arrow_left", disabled = page == 0, onClick = { page-- })
+                                mIconButton("arrow_right",
+                                    disabled = page == ceil(1.0 * terms.size / termsPerPage).toInt(), onClick = { page++ })
+                            }
                         }
                     }
                 }
@@ -45,3 +65,5 @@ fun RBuilder.dictionaryPage() {
         }
     }
 }
+
+fun RBuilder.dictionaryPage() = child(dictionaryPage)
