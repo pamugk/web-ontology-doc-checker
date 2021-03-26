@@ -7,11 +7,13 @@ import com.ccfraser.muirwik.components.mTypography
 import com.ccfraser.muirwik.components.table.*
 import kotlinx.css.*
 import react.*
+import ru.psu.web_ontology_doc_checker.model.documents.FilteredDocument
 import ru.psu.web_ontology_doc_checker.model.documents.RankedDocument
 import styled.css
 
 external interface RangingPageProps: RProps {
     var rankedDocuments: List<RankedDocument>
+    var filteredDocuments: List<FilteredDocument>
 }
 
 private val rankedPage = functionalComponent<RangingPageProps> { props ->
@@ -44,12 +46,15 @@ private val rankedPage = functionalComponent<RangingPageProps> { props ->
             }
         }
         if (selectedDoc != null) {
-            rankedDocDialog(selectedDoc!!, true) { selectedDoc = null }
+            rankedDocDialog(selectedDoc!!, props.filteredDocuments.first { filteredDoc ->
+                filteredDoc.name == selectedDoc!!.name && filteredDoc.path == selectedDoc!!.path },
+                true) { selectedDoc = null }
         }
     }
 }
 
-fun RBuilder.rankedDocsTable(rankedDocuments: List<RankedDocument>) =
+fun RBuilder.rankedDocsTable(rankedDocuments: List<RankedDocument>, filteredDocuments: List<FilteredDocument>) =
     child(rankedPage) {
         attrs.rankedDocuments = rankedDocuments
+        attrs.filteredDocuments = filteredDocuments
     }

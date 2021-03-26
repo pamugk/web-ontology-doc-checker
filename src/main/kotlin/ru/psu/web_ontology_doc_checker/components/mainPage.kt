@@ -17,6 +17,7 @@ import ru.psu.web_ontology_doc_checker.components.filteredDocuments.filteredDocs
 import ru.psu.web_ontology_doc_checker.components.rangedDocuments.rankedDocsTable
 import ru.psu.web_ontology_doc_checker.logic.filterDocuments
 import ru.psu.web_ontology_doc_checker.logic.rankDocuments
+import ru.psu.web_ontology_doc_checker.logic.terms
 import ru.psu.web_ontology_doc_checker.model.documents.Document
 import ru.psu.web_ontology_doc_checker.model.documents.FilteredDocument
 import ru.psu.web_ontology_doc_checker.model.documents.RankedDocument
@@ -49,8 +50,10 @@ private fun handleFileInput(event: Event, onChangeOntology: (Onto) -> Unit) {
     val file = input.files!![0]!!
     val fReader = FileReader()
     fReader.onloadend = { _ ->
-        window.alert("Онтология загружена")
-        onChangeOntology(importOntology(fReader.result as String))
+        val newOntology = importOntology(fReader.result as String)
+        val wrongOntology = newOntology.nodes.none { node -> terms.any { term -> term.term == node.name } }
+        window.alert("Онтология загружена${if (wrongOntology) ", но она не содержит ни одного понятия, занесённого во встроенный словарь понятий" else ""}")
+        onChangeOntology(newOntology)
     }
     fReader.onerror = { _ -> window.alert("Загрузка онтологии не удалась, попробуйте ещё раз") }
     fReader.readAsText(file)
@@ -141,7 +144,7 @@ class MainPage: RComponent<RProps, MainPageState>() {
                             setState { filteredDocuments = filterDocuments(documents, ontology!!, N); processing = false }
                         })
                     }
-                Steps.FILTERED_DOCUMENTS -> filteredDocsList(state.filteredDocuments)
+                Steps.FILTERED_DOCUMENTS -> filteredDocsList(state.filteredDocuments.filter { doc -> doc.terms.isNotEmpty() && doc.sentences.isNotEmpty() })
                 Steps.RANK -> if (state.processing) loader(true, "Идёт ранжирование документов...") else {
                     mCardActions {
                         css {
@@ -154,7 +157,7 @@ class MainPage: RComponent<RProps, MainPageState>() {
                         })
                     }
                 }
-                Steps.RANKED_DOCUMENTS -> rankedDocsTable(state.rankedDocuments)
+                Steps.RANKED_DOCUMENTS -> rankedDocsTable(state.rankedDocuments, state.filteredDocuments)
             }
             if (state.currentStep != Steps.DOCUMENT_COLLECTION) {
                 mCardActions {
@@ -177,6 +180,7 @@ class MainPage: RComponent<RProps, MainPageState>() {
                                 || state.currentStep == Steps.DOCUMENTS && state.documents.isEmpty()
                                 || state.currentStep == Steps.ONTOLOGY && state.ontology == null
                                 || state.currentStep == Steps.FILTER && state.filteredDocuments.isEmpty()
+                                || state.currentStep == Steps.FILTERED_DOCUMENTS && state.filteredDocuments.filter { doc -> doc.terms.isNotEmpty() && doc.sentences.isNotEmpty() }.isEmpty()
                                 || state.currentStep == Steps.RANK && state.rankedDocuments.isEmpty(),
                         onClick = {
                             setState { currentStep = orderOfSteps[orderOfSteps.indexOf(currentStep) + 1] }

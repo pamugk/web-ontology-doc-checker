@@ -18,11 +18,11 @@ fun filterDocuments(documents: Collection<Document>, ontology: Onto, N: Int): Li
     }
 }
 
-private val regExps = terms.associateBy({it.term}, {it.forms.map { form -> "(^|\\W+)$form(\\W+|$)".toRegex(RegexOption.IGNORE_CASE) }})
+private val regExps = terms.associateBy({it.term}, {it.forms.map { form -> "(^|[^а-яА-Я\\w]+)$form([^а-яА-Я\\w]+|$)".toRegex(RegexOption.IGNORE_CASE) }})
 
 private fun bindToOntology(sentence: String, ontology: Onto): List<String> {
     return terms.map{ termInfo -> termInfo.term }.filter{ term ->
-        ontology.getFirstNodeByName(term) != null && regExps[term]!!.any { regex -> regex.matches(sentence)}
+        ontology.getFirstNodeByName(term) != null && regExps[term]!!.any { regex -> regex.containsMatchIn(sentence)}
     }
 }
 
