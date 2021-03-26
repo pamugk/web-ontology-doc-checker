@@ -11,7 +11,7 @@ import kotlinx.css.*
 import react.*
 import ru.psu.web_ontology_doc_checker.logic.terms
 import styled.css
-import kotlin.math.ceil
+import kotlin.math.floor
 import kotlin.math.min
 
 private const val termsPerPage = 5
@@ -53,10 +53,10 @@ private val dictionaryPage = functionalComponent<RProps> {
                                     minWidth = LinearDimension.maxContent
                                     alignItems = Align.center
                                 }
-                                mTypography("${page * termsPerPage + 1}-${(page + 1) * termsPerPage} из ${terms.size}")
+                                mTypography("${page * termsPerPage + 1}-${min((page + 1) * termsPerPage, terms.size)} из ${terms.size}")
                                 mIconButton("arrow_left", disabled = page == 0, onClick = { page-- })
                                 mIconButton("arrow_right",
-                                    disabled = page == ceil(1.0 * terms.size / termsPerPage).toInt(), onClick = { page++ })
+                                    disabled = page == floor(1.0 * terms.size / termsPerPage).toInt(), onClick = { page++ })
                             }
                         }
                     }
