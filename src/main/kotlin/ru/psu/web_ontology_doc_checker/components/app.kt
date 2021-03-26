@@ -9,7 +9,7 @@ import styled.css
 
 private enum class Tabs(val label: String) {
     DOCUMENTS_PROCESSING("Обработка документов"),
-    DICTIONARY("Справочник")
+    DICTIONARY("Словарь")
 }
 
 private val app = functionalComponent<RProps> { props ->
