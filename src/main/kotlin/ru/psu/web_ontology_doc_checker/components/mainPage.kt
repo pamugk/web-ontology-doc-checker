@@ -26,7 +26,7 @@ import ru.psu.web_ontology_doc_checker.utils.importOntology
 import ru.psu.web_ontology_doc_checker.utils.openFileDialog
 import styled.css
 
-private enum class Steps(val description: String) {
+enum class Steps(val description: String) {
     DOCUMENT_COLLECTION("Выбор корпуса документов"),
     DOCUMENTS("Просмотр документы"),
     ONTOLOGY("Выбор управляющей онтологии"),
@@ -49,128 +49,138 @@ private fun handleFileInput(event: Event, onChangeOntology: (Onto) -> Unit) {
     fReader.readAsText(file)
 }
 
-private val mainPage = functionalComponent<RProps> {
-    var currentStep by useState(Steps.DOCUMENT_COLLECTION)
-    var processing by useState(false)
+class MainPageState(
+    var currentStep: Steps, var processing: Boolean,
 
-    var b by useState(1); var K by useState(1)
-    var N by useState(10); var strict by useState(false)
+    var b: Int, var N: Int, var K: Int, var strict: Boolean,
 
-    var ontology by useState<Onto?>(null)
+    var ontology: Onto?,
 
-    var documents by useState<Set<Document>>(emptySet())
-    var filteredDocuments by useState<List<FilteredDocument>>(emptyList())
-    var rankedDocuments by useState<List<RankedDocument>>(emptyList())
+    var documents: Set<Document>,
+    var filteredDocuments: List<FilteredDocument>,
+    var rankedDocuments: List<RankedDocument>
+): RState
 
-    mCard {
-        css {
-            display = Display.flex
-            flex(1.0, 1.0)
-            flexDirection = FlexDirection.column
-        }
-        mCardContent {
-            mTypography("Текущий шаг: \"${currentStep.description}\"")
-        }
-        when(currentStep) {
-            Steps.DOCUMENT_COLLECTION -> documentCollectionPage { documentCollection ->
-                documents = documentCollection.toSet()
-                currentStep = Steps.DOCUMENTS
+class MainPage: RComponent<RProps, MainPageState>() {
+    init {
+        state = MainPageState(
+            Steps.DOCUMENT_COLLECTION, false,
+
+            1, 10, 1, false,
+
+            null, emptySet(), emptyList(), emptyList()
+        )
+    }
+
+    override fun RBuilder.render() {
+        mCard {
+            css {
+                display = Display.flex
+                flex(1.0, 1.0)
+                flexDirection = FlexDirection.column
             }
-            Steps.DOCUMENTS -> documentList(documents,
-                { newDocument -> documents = documents.plus(newDocument) },
-                { removedDocument -> documents = documents.minus(removedDocument) }
-            )
-            Steps.ONTOLOGY -> {
-                if (processing) loader(true, "Идёт загрузка онтологии...") else {
-                    mCardActions {
-                        mButton("Выбрать онтологию по умолчанию", onClick = {
-                            ontology = importOntology(defaultOntology)
-                        })
-                        mButton("Загрузить онтологию...", onClick = {
-                            processing = true
-                            openFileDialog(false) { e -> handleFileInput(e) { newOntology ->
-                                    ontology = newOntology
-                                    processing = false
-                                }
+            mCardContent {
+                mTypography("Текущий шаг: \"${state.currentStep.description}\"")
+            }
+            when(state.currentStep) {
+                Steps.DOCUMENT_COLLECTION -> documentCollectionPage { documentCollection ->
+                    setState{ documents = documentCollection.toSet(); currentStep = Steps.DOCUMENTS }
+                }
+                Steps.DOCUMENTS -> documentList(state.documents,
+                    { newDocument -> setState { documents = documents.plus(newDocument) } },
+                    { removedDocument -> setState { documents = documents.minus(removedDocument) } }
+                )
+                Steps.ONTOLOGY -> {
+                    if (state.processing) loader(true, "Идёт загрузка онтологии...") else {
+                        mCardActions {
+                            css {
+                                flex(1.0, 1.0, FlexBasis.auto)
+                                margin(LinearDimension.auto)
                             }
+                            mButton("Выбрать онтологию по умолчанию", onClick = {
+                                setState { ontology = importOntology(defaultOntology) }
+                            })
+                            mButton("Загрузить онтологию...", onClick = {
+                                setState { processing = true }
+                                openFileDialog(false) { e -> handleFileInput(e) { newOntology ->
+                                        setState { ontology = newOntology; processing = false }
+                                    }
+                                }
+                            })
+                        }
+                    }
+                }
+                Steps.SETTINGS -> settingsPanel(state.b, state.N, state.K, state.strict,
+                    { newB -> setState { b = newB } }, { newN -> setState { N = newN } },
+                    { newK -> setState { K = newK } }, { newStrict -> setState { strict = newStrict } })
+                Steps.FILTER -> if (state.processing) loader(state.processing, "Идёт классификация документов...") else
+                    mCardActions {
+                        css {
+                            flex(1.0, 1.0, FlexBasis.auto)
+                            margin(LinearDimension.auto)
+                        }
+                        mButton("Провести классификацию документов", onClick = {
+                            setState { processing = true }
+                            setState { filteredDocuments = filterDocuments(documents, ontology!!, N); processing = false }
+                        })
+                    }
+                Steps.FILTERED_DOCUMENTS -> filteredDocsList(state.filteredDocuments)
+                Steps.RANK -> if (state.processing) loader(true, "Идёт ранжирование документов...") else {
+                    mCardActions {
+                        css {
+                            flex(1.0, 1.0, FlexBasis.auto)
+                            margin(LinearDimension.auto)
+                        }
+                        mButton("Провести ранжирование документов", onClick = {
+                            setState { processing = true }
+                            setState { rankedDocuments = rankDocuments(b, N, K, strict, filteredDocuments); processing = false }
                         })
                     }
                 }
+                Steps.RANKED_DOCUMENTS -> rankedDocsTable(state.rankedDocuments)
             }
-            Steps.SETTINGS -> settingsPanel(b, N, K, strict, { newB -> b = newB }, { newN -> N = newN }, { newK -> K = newK },
-                { newStrict -> strict = newStrict })
-            Steps.FILTER -> if (processing) loader(processing, "Идёт классификация документов...") else
+            if (state.currentStep != Steps.DOCUMENT_COLLECTION) {
                 mCardActions {
-                    mButton("Провести классификацию документов", onClick = {
-                        processing = true
-                        filteredDocuments = filterDocuments(documents, ontology!!, N)
-                        processing = false
-                    })
-            }
-            Steps.FILTERED_DOCUMENTS -> filteredDocsList(filteredDocuments)
-            Steps.RANK -> if (processing) loader(true, "Идёт ранжирование документов...") else {
-                mButton("Провести ранжирование документов", onClick = {
-                    processing = true
-                    rankedDocuments = rankDocuments(b, N, K, strict, filteredDocuments)
-                    processing = false
-                })
-            }
-            Steps.RANKED_DOCUMENTS -> rankedDocsTable(rankedDocuments)
-        }
-        if (currentStep != Steps.DOCUMENT_COLLECTION) {
-            mCardActions {
-                mButton("Назад",
-                    disabled = processing,
-                    onClick = {
-                        when(currentStep) {
-                            Steps.DOCUMENT_COLLECTION -> TODO()
-                            Steps.DOCUMENTS -> {
-                                currentStep = Steps.DOCUMENT_COLLECTION
-                                documents = emptySet()
+                    mButton("Назад",
+                        disabled = state.processing,
+                        onClick = {
+                            when(state.currentStep) {
+                                Steps.DOCUMENT_COLLECTION -> TODO()
+                                Steps.DOCUMENTS -> setState { currentStep = Steps.DOCUMENT_COLLECTION; documents = emptySet() }
+                                Steps.ONTOLOGY -> setState { currentStep = Steps.DOCUMENTS; ontology = null }
+                                Steps.SETTINGS -> setState { currentStep = Steps.ONTOLOGY }
+                                Steps.FILTER -> setState { currentStep = Steps.SETTINGS; filteredDocuments = emptyList() }
+                                Steps.FILTERED_DOCUMENTS -> setState { currentStep = Steps.FILTER; filteredDocuments = emptyList() }
+                                Steps.RANK -> setState{ currentStep = Steps.FILTERED_DOCUMENTS; rankedDocuments = emptyList() }
+                                Steps.RANKED_DOCUMENTS -> setState{ currentStep = Steps.RANK; rankedDocuments = emptyList() }
                             }
-                            Steps.ONTOLOGY -> {
-                                currentStep = Steps.DOCUMENTS
-                                ontology = null
+                        })
+                    mButton("Далее",
+                        disabled = state.processing || state.currentStep == Steps.RANKED_DOCUMENTS
+                                || state.currentStep == Steps.DOCUMENTS && state.documents.isEmpty()
+                                || state.currentStep == Steps.ONTOLOGY && state.ontology == null
+                                || state.currentStep == Steps.FILTER && state.filteredDocuments.isEmpty()
+                                || state.currentStep == Steps.RANK && state.rankedDocuments.isEmpty(),
+                        onClick = {
+                            setState { currentStep = when(currentStep) {
+                                Steps.DOCUMENT_COLLECTION -> Steps.DOCUMENTS
+                                Steps.DOCUMENTS -> Steps.ONTOLOGY
+                                Steps.ONTOLOGY -> Steps.SETTINGS
+                                Steps.SETTINGS -> Steps.FILTER
+                                Steps.FILTER -> Steps.FILTERED_DOCUMENTS
+                                Steps.FILTERED_DOCUMENTS -> Steps.RANK
+                                Steps.RANK -> Steps.RANKED_DOCUMENTS
+                                Steps.RANKED_DOCUMENTS -> TODO()
                             }
-                            Steps.SETTINGS -> currentStep = Steps.ONTOLOGY
-                            Steps.FILTER -> {
-                                currentStep = Steps.SETTINGS
-                                filteredDocuments = emptyList()
                             }
-                            Steps.FILTERED_DOCUMENTS -> {
-                                currentStep = Steps.FILTERED_DOCUMENTS
-                                filteredDocuments = emptyList()
-                            }
-                            Steps.RANK -> {
-                                currentStep = Steps.FILTERED_DOCUMENTS
-                                rankedDocuments = emptyList()
-                            }
-                            Steps.RANKED_DOCUMENTS -> currentStep = Steps.RANK
-                        }
-                    })
-                mButton("Далее",
-                    disabled = processing || currentStep == Steps.RANKED_DOCUMENTS
-                            || currentStep == Steps.DOCUMENTS && documents.isEmpty()
-                            || currentStep == Steps.ONTOLOGY && ontology == null
-                            || currentStep == Steps.FILTER && filteredDocuments.isEmpty()
-                            || currentStep == Steps.RANK && rankedDocuments.isEmpty(),
-                    onClick = {
-                        currentStep = when(currentStep) {
-                            Steps.DOCUMENT_COLLECTION -> Steps.DOCUMENTS
-                            Steps.DOCUMENTS -> Steps.ONTOLOGY
-                            Steps.ONTOLOGY -> Steps.SETTINGS
-                            Steps.SETTINGS -> Steps.FILTER
-                            Steps.FILTER -> Steps.FILTERED_DOCUMENTS
-                            Steps.FILTERED_DOCUMENTS -> Steps.RANK
-                            Steps.RANK -> Steps.RANKED_DOCUMENTS
-                            Steps.RANKED_DOCUMENTS -> TODO()
-                        }
-                    })
+                        })
+                }
             }
         }
     }
+
 }
 
 fun RBuilder.mainPage() {
-    child(mainPage) {}
+    child(MainPage::class) {}
 }

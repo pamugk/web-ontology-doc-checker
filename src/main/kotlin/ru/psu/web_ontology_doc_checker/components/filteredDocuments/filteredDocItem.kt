@@ -7,6 +7,7 @@ import com.ccfraser.muirwik.components.list.mListItemSecondaryAction
 import com.ccfraser.muirwik.components.list.mListItemText
 import com.ccfraser.muirwik.components.mAvatar
 import com.ccfraser.muirwik.components.mIcon
+import com.ccfraser.muirwik.components.mTooltip
 import kotlinx.css.*
 import kotlinx.css.properties.border
 import react.RBuilder
@@ -32,7 +33,9 @@ fun RBuilder.filteredDocItem(document: FilteredDocument, onSelect: (FilteredDocu
             }
         }
         mListItemSecondaryAction {
-            mIconButton("download", onClick = { onSelect(document)})
+            mTooltip("Сохранить \"онтологию привязки\" документа") {
+                mIconButton("download", onClick = { onSelect(document)})
+            }
         }
     }
 }

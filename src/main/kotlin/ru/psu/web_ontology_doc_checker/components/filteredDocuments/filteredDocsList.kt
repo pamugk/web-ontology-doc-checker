@@ -4,6 +4,7 @@ import com.ccfraser.muirwik.components.button.mIconButton
 import com.ccfraser.muirwik.components.card.mCardActions
 import com.ccfraser.muirwik.components.card.mCardContent
 import com.ccfraser.muirwik.components.list.mList
+import com.ccfraser.muirwik.components.mTooltip
 import com.ccfraser.muirwik.components.mTypography
 import kotlinx.css.*
 import react.*
@@ -27,7 +28,9 @@ private val filteredDocsList = functionalComponent<FilteringPageProps> { props -
 
     mCardActions {
         if (props.filteredDocuments.isNotEmpty()) {
-            mIconButton("download", onClick = { onDownload(props.filteredDocuments) })
+            mTooltip("Сохранить \"онтологии привязки\" всех документов"){
+                mIconButton("download", onClick = { onDownload(props.filteredDocuments) })
+            }
         }
     }
     mCardContent {
@@ -37,7 +40,7 @@ private val filteredDocsList = functionalComponent<FilteringPageProps> { props -
             flexDirection = FlexDirection.column
         }
         if (props.filteredDocuments.isEmpty()) {
-            mTypography("Нет документов с фильтрованным содержимым :( ") {
+            mTypography("Нет документов, связанных с исследуемой ПрО :( ") {
                 css {
                     margin(LinearDimension.auto)
                 }

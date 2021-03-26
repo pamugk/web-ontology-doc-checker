@@ -11,7 +11,7 @@ fun filterDocuments(documents: Collection<Document>, ontology: Onto, N: Int): Li
     return documents.map { doc ->
         val sentences = tokenize(doc.text)
             .withIndex()
-            .map { (i, sentence) -> Sentence(i, sentence, bindToOntology(sentence)) }
+            .map { (i, sentence) -> Sentence(i, sentence, bindToOntology(sentence, ontology)) }
             .filter { sentence -> sentence.terms.isNotEmpty() }
         val boundTerms = sentences.flatMap { sentence -> sentence.terms }.toSet()
         return@map FilteredDocument(doc.path, doc.name, boundTerms, sentences, buildBoundOntology(boundTerms, ontology, N))
@@ -20,8 +20,10 @@ fun filterDocuments(documents: Collection<Document>, ontology: Onto, N: Int): Li
 
 private val regExps = terms.associateBy({it.term}, {it.forms.map { form -> "(^|\\W+)$form(\\W+|$)".toRegex(RegexOption.IGNORE_CASE) }})
 
-private fun bindToOntology(sentence: String): List<String> {
-    return terms.map{ termInfo -> termInfo.term }.filter{ term -> regExps[term]!!.any { regex -> regex.matches(sentence)} }
+private fun bindToOntology(sentence: String, ontology: Onto): List<String> {
+    return terms.map{ termInfo -> termInfo.term }.filter{ term ->
+        ontology.getFirstNodeByName(term) != null && regExps[term]!!.any { regex -> regex.matches(sentence)}
+    }
 }
 
 private fun buildBoundOntology(boundTerms: Collection<String>, sourceOntology: Onto, N: Int):Onto {
