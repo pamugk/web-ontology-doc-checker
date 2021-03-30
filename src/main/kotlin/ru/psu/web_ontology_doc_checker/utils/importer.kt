@@ -10,10 +10,6 @@ fun importOntology(ontoText: String): Onto {
     return Json.decodeFromString(serializer(), ontoText)
 }
 
-fun importDictionary(dictionary: String): List<TermInfo> {
-    return Json.decodeFromString(serializer(), dictionary)
-}
-
 fun exportOntology(ontology: Onto): String {
     return Json.encodeToString(serializer(), ontology)
 }

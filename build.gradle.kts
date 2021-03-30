@@ -15,11 +15,12 @@ repositories {
 dependencies {
     val kotlinVersion = "1.4.30"
     val kotlinJsVersion = "pre.148-kotlin-$kotlinVersion"
+    val ktor_version = "1.5.1"
 
     implementation(kotlin("stdlib-js", kotlinVersion))
     implementation("org.jetbrains:kotlin-styled:5.2.1-$kotlinJsVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
-
+    implementation("io.ktor:ktor-client-js:$ktor_version")
+    implementation("io.ktor:ktor-client-serialization:$ktor_version")
     implementation("com.ccfraser.muirwik:muirwik-components:0.6.3")
 }
 

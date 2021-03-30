@@ -9,14 +9,18 @@ import com.ccfraser.muirwik.components.mTypography
 import com.ccfraser.muirwik.components.table.*
 import kotlinx.css.*
 import react.*
-import ru.psu.web_ontology_doc_checker.logic.terms
+import ru.psu.web_ontology_doc_checker.model.TermInfo
 import styled.css
 import kotlin.math.floor
 import kotlin.math.min
 
 private const val termsPerPage = 5
 
-private val dictionaryPage = functionalComponent<RProps> {
+external interface DictionaryProps: RProps {
+    var terms: List<TermInfo>
+}
+
+private val dictionaryPage = functionalComponent<DictionaryProps> { props ->
     var page by useState(0)
 
     mDialogContent {
@@ -34,13 +38,13 @@ private val dictionaryPage = functionalComponent<RProps> {
                     }
                 }
                 mTableBody {
-                    for (i in page * termsPerPage until min((page + 1) * termsPerPage, terms.size)) {
+                    for (i in page * termsPerPage until min((page + 1) * termsPerPage, props.terms.size)) {
                         mTableRow("row$i") {
-                            mTableCell("term$i") { mTypography(terms[i].term, MTypographyVariant.body2) }
+                            mTableCell("term$i") { mTypography(props.terms[i].term, MTypographyVariant.body2) }
                             mTableCell("forms$i") {
-                                mTypography(terms[i].forms.joinToString("; "), MTypographyVariant.body2, align = MTypographyAlign.center)
+                                mTypography(props.terms[i].forms.joinToString("; "), MTypographyVariant.body2, align = MTypographyAlign.center)
                             }
-                            mTableCell("def$i") { mTypography(terms[i].definition, MTypographyVariant.body2, align = MTypographyAlign.center) }
+                            mTableCell("def$i") { mTypography(props.terms[i].definition, MTypographyVariant.body2, align = MTypographyAlign.center) }
                         }
                     }
                 }
@@ -53,10 +57,10 @@ private val dictionaryPage = functionalComponent<RProps> {
                                     minWidth = LinearDimension.maxContent
                                     alignItems = Align.center
                                 }
-                                mTypography("${page * termsPerPage + 1}-${min((page + 1) * termsPerPage, terms.size)} из ${terms.size}")
+                                mTypography("${page * termsPerPage + 1}-${min((page + 1) * termsPerPage, props.terms.size)} из ${props.terms.size}")
                                 mIconButton("arrow_left", disabled = page == 0, onClick = { page-- })
                                 mIconButton("arrow_right",
-                                    disabled = page == floor(1.0 * terms.size / termsPerPage).toInt(), onClick = { page++ })
+                                    disabled = page == floor(1.0 * props.terms.size / termsPerPage).toInt(), onClick = { page++ })
                             }
                         }
                     }
@@ -66,4 +70,6 @@ private val dictionaryPage = functionalComponent<RProps> {
     }
 }
 
-fun RBuilder.dictionaryPage() = child(dictionaryPage)
+fun RBuilder.dictionaryPage(terms: List<TermInfo>) = child(dictionaryPage) {
+    attrs.terms = terms
+}

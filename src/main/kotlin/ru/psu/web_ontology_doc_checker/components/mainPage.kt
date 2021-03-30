@@ -17,7 +17,7 @@ import ru.psu.web_ontology_doc_checker.components.filteredDocuments.filteredDocs
 import ru.psu.web_ontology_doc_checker.components.rangedDocuments.rankedDocsTable
 import ru.psu.web_ontology_doc_checker.logic.filterDocuments
 import ru.psu.web_ontology_doc_checker.logic.rankDocuments
-import ru.psu.web_ontology_doc_checker.logic.terms
+import ru.psu.web_ontology_doc_checker.model.TermInfo
 import ru.psu.web_ontology_doc_checker.model.documents.Document
 import ru.psu.web_ontology_doc_checker.model.documents.FilteredDocument
 import ru.psu.web_ontology_doc_checker.model.documents.RankedDocument
@@ -45,7 +45,7 @@ private val orderOfSteps = listOf(
     Steps.RANK, Steps.RANKED_DOCUMENTS
 )
 
-private fun handleFileInput(event: Event, onChangeOntology: (Onto) -> Unit) {
+private fun handleFileInput(event: Event, terms: List<TermInfo>, onChangeOntology: (Onto) -> Unit) {
     val input = event.target as? HTMLInputElement ?: return
     val file = input.files!![0]!!
     val fReader = FileReader()
@@ -71,7 +71,11 @@ class MainPageState(
     var rankedDocuments: List<RankedDocument>
 ): RState
 
-class MainPage: RComponent<RProps, MainPageState>() {
+external interface MainProps: RProps {
+    var terms: List<TermInfo>
+}
+
+class MainPage: RComponent<MainProps, MainPageState>() {
     init {
         state = MainPageState(
             Steps.DOCUMENT_COLLECTION, false,
@@ -122,7 +126,7 @@ class MainPage: RComponent<RProps, MainPageState>() {
                             })
                             mButton("Загрузить онтологию...", onClick = {
                                 setState { processing = true }
-                                openFileDialog(false) { e -> handleFileInput(e) { newOntology ->
+                                openFileDialog(false) { e -> handleFileInput(e, props.terms) { newOntology ->
                                         setState { ontology = newOntology; processing = false }
                                     }
                                 }
@@ -141,7 +145,7 @@ class MainPage: RComponent<RProps, MainPageState>() {
                         }
                         mButton("Провести классификацию документов", onClick = {
                             setState { processing = true }
-                            setState { filteredDocuments = filterDocuments(documents, ontology!!, N); processing = false }
+                            setState { filteredDocuments = filterDocuments(documents, ontology!!, N, props.terms); processing = false }
                         })
                     }
                 Steps.FILTERED_DOCUMENTS -> filteredDocsList(state.filteredDocuments.filter { doc -> doc.terms.isNotEmpty() && doc.sentences.isNotEmpty() })
@@ -180,7 +184,7 @@ class MainPage: RComponent<RProps, MainPageState>() {
                                 || state.currentStep == Steps.DOCUMENTS && state.documents.isEmpty()
                                 || state.currentStep == Steps.ONTOLOGY && state.ontology == null
                                 || state.currentStep == Steps.FILTER && state.filteredDocuments.isEmpty()
-                                || state.currentStep == Steps.FILTERED_DOCUMENTS && state.filteredDocuments.filter { doc -> doc.terms.isNotEmpty() && doc.sentences.isNotEmpty() }.isEmpty()
+                                || state.currentStep == Steps.FILTERED_DOCUMENTS && state.filteredDocuments.none { doc -> doc.terms.isNotEmpty() && doc.sentences.isNotEmpty() }
                                 || state.currentStep == Steps.RANK && state.rankedDocuments.isEmpty(),
                         onClick = {
                             setState { currentStep = orderOfSteps[orderOfSteps.indexOf(currentStep) + 1] }
@@ -189,9 +193,10 @@ class MainPage: RComponent<RProps, MainPageState>() {
             }
         }
     }
-
 }
 
-fun RBuilder.mainPage() {
-    child(MainPage::class) {}
+fun RBuilder.mainPage(terms: List<TermInfo>) {
+    child(MainPage::class) {
+        attrs.terms = terms
+    }
 }
