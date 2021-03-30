@@ -17,6 +17,6 @@ private val httpClient = HttpClient {
 
 fun getTerms(onLoaded: (List<TermInfo>) -> Unit) {
     GlobalScope.launch {
-        onLoaded(httpClient.get(path = "/dictionary.json"))
+        onLoaded(httpClient.get("https://pamugk.github.io/web-ontology-doc-checker/dictionary.json"))
     }
 }
